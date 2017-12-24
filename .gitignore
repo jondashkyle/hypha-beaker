@@ -2,5 +2,5 @@
 .dat
 
 node_modules
-bundles/*
+site/bundles/*
 dat.json
