@@ -12,25 +12,23 @@ function view (state, emit) {
   if (!state.loaded && typeof page === 'undefined') return loading()
   var view = views[page.view] || views.default
 
-  return html`
-    <body>
-      ${view(xtend(state, { page: page }), emit)}
-    </body>
-  `
+  return body(view(xtend(state, { page: page }), emit))
 }
 
 function loading () {
-  return html`
-    <body>
-      loading
-    </body>
-  `
+  return body(html`
+    <div class="x xjc xac">loading</div>
+  `)
 }
 
 function notfound () {
+  return body('not found')
+}
+
+function body (view) {
   return html`
-    <body>
-      not found
+    <body class="ff-sans bgc-black fc-white">
+      ${view}
     </body>
   `
 }

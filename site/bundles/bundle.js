@@ -1,1656 +1,53 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
-
-
-}).call(this,require('_process'))
-},{"_process":5}],2:[function(require,module,exports){
-(function (process,global){
-Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
-'use strict';
-// compare and isBuffer taken from https://github.com/feross/buffer/blob/680e9e5e488f22aac27599a57dc844a6315928dd/index.js
-// original notice:
-/*!
- * The buffer module from node.js, for the browser.
- *
- * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
- * @license  MIT
- */
-function compare(a, b) {
-    if (a === b) {
-        return 0;
-    }
-    var x = a.length;
-    var y = b.length;
-    for (var i = 0, len = Math.min(x, y);i < len; ++i) {
-        if (a[i] !== b[i]) {
-            x = a[i];
-            y = b[i];
-            break;
-        }
-    }
-    if (x < y) {
-        return -1;
-    }
-    if (y < x) {
-        return 1;
-    }
-    return 0;
-}
-
-function isBuffer(b) {
-    if (global.Buffer && typeof global.Buffer.isBuffer === 'function') {
-        return global.Buffer.isBuffer(b);
-    }
-    return !(!(b != null && b._isBuffer));
-}
-
-// based on node assert, original notice:
-// http://wiki.commonjs.org/wiki/Unit_Testing/1.0
-//
-// THIS IS NOT TESTED NOR LIKELY TO WORK OUTSIDE V8!
-//
-// Originally from narwhal.js (http://narwhaljs.org)
-// Copyright (c) 2009 Thomas Robinson <280north.com>
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the 'Software'), to
-// deal in the Software without restriction, including without limitation the
-// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-// sell copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
-// ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-var util = require('util/');
-var hasOwn = Object.prototype.hasOwnProperty;
-var pSlice = Array.prototype.slice;
-var functionsHaveNames = (function () {
-    return (function foo() {}).name === 'foo';
-})();
-function pToString(obj) {
-    return Object.prototype.toString.call(obj);
-}
-
-function isView(arrbuf) {
-    if (isBuffer(arrbuf)) {
-        return false;
-    }
-    if (typeof global.ArrayBuffer !== 'function') {
-        return false;
-    }
-    if (typeof ArrayBuffer.isView === 'function') {
-        return ArrayBuffer.isView(arrbuf);
-    }
-    if (!arrbuf) {
-        return false;
-    }
-    if (arrbuf instanceof DataView) {
-        return true;
-    }
-    if (arrbuf.buffer && arrbuf.buffer instanceof ArrayBuffer) {
-        return true;
-    }
-    return false;
-}
-
-// 1. The assert module provides functions that throw
-// AssertionError's when particular conditions are not met. The
-// assert module must conform to the following interface.
-var assert = module.exports = ok;
-// 2. The AssertionError is defined in assert.
-// new assert.AssertionError({ message: message,
-//                             actual: actual,
-//                             expected: expected })
-var regex = /\s*function\s+([^\(\s]*)\s*/;
-// based on https://github.com/ljharb/function.prototype.name/blob/adeeeec8bfcc6068b187d7d9fb3d5bb1d3a30899/implementation.js
-function getName(func) {
-    if (!util.isFunction(func)) {
+var html = require('choo/html');
+module.exports = component;
+function component(id, props) {
+    if (!id) 
         return;
-    }
-    if (functionsHaveNames) {
-        return func.name;
-    }
-    var str = func.toString();
-    var match = str.match(regex);
-    return match && match[1];
-}
-
-assert.AssertionError = function AssertionError(options) {
-    this.name = 'AssertionError';
-    this.actual = options.actual;
-    this.expected = options.expected;
-    this.operator = options.operator;
-    if (options.message) {
-        this.message = options.message;
-        this.generatedMessage = false;
-    } else {
-        this.message = getMessage(this);
-        this.generatedMessage = true;
-    }
-    var stackStartFunction = options.stackStartFunction || fail;
-    if (Error.captureStackTrace) {
-        Error.captureStackTrace(this, stackStartFunction);
-    } else {
-        // non v8 browsers so we can have a stacktrace
-        var err = new Error();
-        if (err.stack) {
-            var out = err.stack;
-            // try to strip useless frames
-            var fn_name = getName(stackStartFunction);
-            var idx = out.indexOf('\n' + fn_name);
-            if (idx >= 0) {
-                // once we have located the function frame
-                // we need to strip out everything before it (and its line)
-                var next_line = out.indexOf('\n', idx + 1);
-                out = out.substring(next_line + 1);
-            }
-            this.stack = out;
-        }
-    }
-};
-// assert.AssertionError instanceof Error
-util.inherits(assert.AssertionError, Error);
-function truncate(s, n) {
-    if (typeof s === 'string') {
-        return s.length < n ? s : s.slice(0, n);
-    } else {
-        return s;
-    }
-}
-
-function inspect(something) {
-    if (functionsHaveNames || !util.isFunction(something)) {
-        return util.inspect(something);
-    }
-    var rawname = getName(something);
-    var name = rawname ? ': ' + rawname : '';
-    return '[Function' + name + ']';
-}
-
-function getMessage(self) {
-    return truncate(inspect(self.actual), 128) + ' ' + self.operator + ' ' + truncate(inspect(self.expected), 128);
-}
-
-// At present only the three keys mentioned above are used and
-// understood by the spec. Implementations or sub modules can pass
-// other keys to the AssertionError's constructor - they will be
-// ignored.
-// 3. All of the following functions must throw an AssertionError
-// when a corresponding condition is not met, with a message that
-// may be undefined if not provided.  All assertion methods provide
-// both the actual and expected values to the assertion error for
-// display purposes.
-function fail(actual, expected, message, operator, stackStartFunction) {
-    throw new assert.AssertionError({
-        message: message,
-        actual: actual,
-        expected: expected,
-        operator: operator,
-        stackStartFunction: stackStartFunction
-    });
-}
-
-// EXTENSION! allows for well behaved errors defined elsewhere.
-assert.fail = fail;
-// 4. Pure assertion tests whether a value is truthy, as determined
-// by !!guard.
-// assert.ok(guard, message_opt);
-// This statement is equivalent to assert.equal(true, !!guard,
-// message_opt);. To test strictly for the value true, use
-// assert.strictEqual(true, guard, message_opt);.
-function ok(value, message) {
-    if (!value) 
-        fail(value, true, message, '==', assert.ok);
-}
-
-assert.ok = ok;
-// 5. The equality assertion tests shallow, coercive equality with
-// ==.
-// assert.equal(actual, expected, message_opt);
-assert.equal = function equal(actual, expected, message) {
-    if (actual != expected) 
-        fail(actual, expected, message, '==', assert.equal);
-};
-// 6. The non-equality assertion tests for whether two objects are not equal
-// with != assert.notEqual(actual, expected, message_opt);
-assert.notEqual = function notEqual(actual, expected, message) {
-    if (actual == expected) {
-        fail(actual, expected, message, '!=', assert.notEqual);
-    }
-};
-// 7. The equivalence assertion tests a deep equality relation.
-// assert.deepEqual(actual, expected, message_opt);
-assert.deepEqual = function deepEqual(actual, expected, message) {
-    if (!_deepEqual(actual, expected, false)) {
-        fail(actual, expected, message, 'deepEqual', assert.deepEqual);
-    }
-};
-assert.deepStrictEqual = function deepStrictEqual(actual, expected, message) {
-    if (!_deepEqual(actual, expected, true)) {
-        fail(actual, expected, message, 'deepStrictEqual', assert.deepStrictEqual);
-    }
-};
-function _deepEqual(actual, expected, strict, memos) {
-    // 7.1. All identical values are equivalent, as determined by ===.
-    if (actual === expected) {
-        return true;
-    } else if (isBuffer(actual) && isBuffer(expected)) {
-        return compare(actual, expected) === 0;
-    // 7.2. If the expected value is a Date object, the actual value is
-    // equivalent if it is also a Date object that refers to the same time.
-    } else if (util.isDate(actual) && util.isDate(expected)) {
-        return actual.getTime() === expected.getTime();
-    // 7.3 If the expected value is a RegExp object, the actual value is
-    // equivalent if it is also a RegExp object with the same source and
-    // properties (`global`, `multiline`, `lastIndex`, `ignoreCase`).
-    } else if (util.isRegExp(actual) && util.isRegExp(expected)) {
-        return actual.source === expected.source && actual.global === expected.global && actual.multiline === expected.multiline && actual.lastIndex === expected.lastIndex && actual.ignoreCase === expected.ignoreCase;
-    // 7.4. Other pairs that do not both pass typeof value == 'object',
-    // equivalence is determined by ==.
-    } else if ((actual === null || typeof actual !== 'object') && (expected === null || typeof expected !== 'object')) {
-        return strict ? actual === expected : actual == expected;
-    // If both values are instances of typed arrays, wrap their underlying
-    // ArrayBuffers in a Buffer each to increase performance
-    // This optimization requires the arrays to have the same type as checked by
-    // Object.prototype.toString (aka pToString). Never perform binary
-    // comparisons for Float*Arrays, though, since e.g. +0 === -0 but their
-    // bit patterns are not identical.
-    } else if (isView(actual) && isView(expected) && pToString(actual) === pToString(expected) && !(actual instanceof Float32Array || actual instanceof Float64Array)) {
-        return compare(new Uint8Array(actual.buffer), new Uint8Array(expected.buffer)) === 0;
-    // 7.5 For all other Object pairs, including Array objects, equivalence is
-    // determined by having the same number of owned properties (as verified
-    // with Object.prototype.hasOwnProperty.call), the same set of keys
-    // (although not necessarily the same order), equivalent values for every
-    // corresponding key, and an identical 'prototype' property. Note: this
-    // accounts for both named and indexed properties on Arrays.
-    } else if (isBuffer(actual) !== isBuffer(expected)) {
-        return false;
-    } else {
-        memos = memos || {
-            actual: [],
-            expected: []
-        };
-        var actualIndex = memos.actual.indexOf(actual);
-        if (actualIndex !== -1) {
-            if (actualIndex === memos.expected.indexOf(expected)) {
-                return true;
-            }
-        }
-        memos.actual.push(actual);
-        memos.expected.push(expected);
-        return objEquiv(actual, expected, strict, memos);
-    }
-}
-
-function isArguments(object) {
-    return Object.prototype.toString.call(object) == '[object Arguments]';
-}
-
-function objEquiv(a, b, strict, actualVisitedObjects) {
-    if (a === null || a === undefined || b === null || b === undefined) 
-        return false;
-    // if one is a primitive, the other must be same
-    if (util.isPrimitive(a) || util.isPrimitive(b)) 
-        return a === b;
-    if (strict && Object.getPrototypeOf(a) !== Object.getPrototypeOf(b)) 
-        return false;
-    var aIsArgs = isArguments(a);
-    var bIsArgs = isArguments(b);
-    if (aIsArgs && !bIsArgs || !aIsArgs && bIsArgs) 
-        return false;
-    if (aIsArgs) {
-        a = pSlice.call(a);
-        b = pSlice.call(b);
-        return _deepEqual(a, b, strict);
-    }
-    var ka = objectKeys(a);
-    var kb = objectKeys(b);
-    var key, i;
-    // having the same number of owned properties (keys incorporates
-    // hasOwnProperty)
-    if (ka.length !== kb.length) 
-        return false;
-    //the same set of keys (although not necessarily the same order),
-    ka.sort();
-    kb.sort();
-    //~~~cheap key test
-    for (i = ka.length - 1; i >= 0; i--) {
-        if (ka[i] !== kb[i]) 
-            return false;
-    }
-    //equivalent values for every corresponding key, and
-    //~~~possibly expensive deep test
-    for (i = ka.length - 1; i >= 0; i--) {
-        key = ka[i];
-        if (!_deepEqual(a[key], b[key], strict, actualVisitedObjects)) 
-            return false;
-    }
-    return true;
-}
-
-// 8. The non-equivalence assertion tests for any deep inequality.
-// assert.notDeepEqual(actual, expected, message_opt);
-assert.notDeepEqual = function notDeepEqual(actual, expected, message) {
-    if (_deepEqual(actual, expected, false)) {
-        fail(actual, expected, message, 'notDeepEqual', assert.notDeepEqual);
-    }
-};
-assert.notDeepStrictEqual = notDeepStrictEqual;
-function notDeepStrictEqual(actual, expected, message) {
-    if (_deepEqual(actual, expected, true)) {
-        fail(actual, expected, message, 'notDeepStrictEqual', notDeepStrictEqual);
-    }
-}
-
-// 9. The strict equality assertion tests strict equality, as determined by ===.
-// assert.strictEqual(actual, expected, message_opt);
-assert.strictEqual = function strictEqual(actual, expected, message) {
-    if (actual !== expected) {
-        fail(actual, expected, message, '===', assert.strictEqual);
-    }
-};
-// 10. The strict non-equality assertion tests for strict inequality, as
-// determined by !==.  assert.notStrictEqual(actual, expected, message_opt);
-assert.notStrictEqual = function notStrictEqual(actual, expected, message) {
-    if (actual === expected) {
-        fail(actual, expected, message, '!==', assert.notStrictEqual);
-    }
-};
-function expectedException(actual, expected) {
-    if (!actual || !expected) {
-        return false;
-    }
-    if (Object.prototype.toString.call(expected) == '[object RegExp]') {
-        return expected.test(actual);
-    }
-    try {
-        if (actual instanceof expected) {
-            return true;
-        }
-    } catch (e) {}
-    // Ignore.  The instanceof check doesn't work for arrow functions.
-    if (Error.isPrototypeOf(expected)) {
-        return false;
-    }
-    return expected.call({}, actual) === true;
-}
-
-function _tryBlock(block) {
-    var error;
-    try {
-        block();
-    } catch (e) {
-        error = e;
-    }
-    return error;
-}
-
-function _throws(shouldThrow, block, expected, message) {
-    var actual;
-    if (typeof block !== 'function') {
-        throw new TypeError('"block" argument must be a function');
-    }
-    if (typeof expected === 'string') {
-        message = expected;
-        expected = null;
-    }
-    actual = _tryBlock(block);
-    message = (expected && expected.name ? ' (' + expected.name + ').' : '.') + (message ? ' ' + message : '.');
-    if (shouldThrow && !actual) {
-        fail(actual, expected, 'Missing expected exception' + message);
-    }
-    var userProvidedMessage = typeof message === 'string';
-    var isUnwantedException = !shouldThrow && util.isError(actual);
-    var isUnexpectedException = !shouldThrow && actual && !expected;
-    if (isUnwantedException && userProvidedMessage && expectedException(actual, expected) || isUnexpectedException) {
-        fail(actual, expected, 'Got unwanted exception' + message);
-    }
-    if (shouldThrow && actual && expected && !expectedException(actual, expected) || !shouldThrow && actual) {
-        throw actual;
-    }
-}
-
-// 11. Expected to throw an error:
-// assert.throws(block, Error_opt, message_opt);
-assert.throws = function (block, error, message) { /*optional*/ /*optional*/
-    _throws(true, block, error, message);
-};
-// EXTENSION! This is annoying to write outside this module.
-assert.doesNotThrow = function (block, error, message) { /*optional*/ /*optional*/
-    _throws(false, block, error, message);
-};
-assert.ifError = function (err) {
-    if (err) 
-        throw err;
-};
-var objectKeys = Object.keys || function (obj) {
-    var keys = [];
-    for (var key in obj) {
-        if (hasOwn.call(obj, key)) 
-            keys.push(key);
-    }
-    return keys;
-};
-
-
-}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":5,"util/":8}],3:[function(require,module,exports){
-(function (process){
-Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-function EventEmitter() {
-    this._events = this._events || {};
-    this._maxListeners = this._maxListeners || undefined;
-}
-
-module.exports = EventEmitter;
-// Backwards-compat with node 0.10.x
-EventEmitter.EventEmitter = EventEmitter;
-EventEmitter.prototype._events = undefined;
-EventEmitter.prototype._maxListeners = undefined;
-// By default EventEmitters will print a warning if more than 10 listeners are
-// added to it. This is a useful default which helps finding memory leaks.
-EventEmitter.defaultMaxListeners = 10;
-// Obviously not all Emitters should be limited to 10. This function allows
-// that to be increased. Set to zero for unlimited.
-EventEmitter.prototype.setMaxListeners = function (n) {
-    if (!isNumber(n) || n < 0 || isNaN(n)) 
-        throw TypeError('n must be a positive number');
-    this._maxListeners = n;
-    return this;
-};
-EventEmitter.prototype.emit = function (type) {
-    var er, handler, len, args, i, listeners;
-    if (!this._events) 
-        this._events = {};
-    // If there is no 'error' event listener then throw.
-    if (type === 'error') {
-        if (!this._events.error || isObject(this._events.error) && !this._events.error.length) {
-            er = arguments[1];
-            if (er instanceof Error) {
-                throw er; //  Unhandled 'error' event
-            } else {
-                // At least give some kind of context to the user
-                var err = new Error('Uncaught, unspecified "error" event. (' + er + ')');
-                err.context = er;
-                throw err;
-            }
-        }
-    }
-    handler = this._events[type];
-    if (isUndefined(handler)) 
-        return false;
-    if (isFunction(handler)) {
-        switch (arguments.length) {
-                // fast cases
-            case 1:
-                handler.call(this);
-                break;
-            case 2:
-                handler.call(this, arguments[1]);
-                break;
-            case 3:
-                handler.call(this, arguments[1], arguments[2]);
-                break;
-            default:
-                // slower
-                args = Array.prototype.slice.call(arguments, 1);
-                handler.apply(this, args);
-        }
-    } else if (isObject(handler)) {
-        args = Array.prototype.slice.call(arguments, 1);
-        listeners = handler.slice();
-        len = listeners.length;
-        for (i = 0; i < len; i++) 
-            listeners[i].apply(this, args);
-    }
-    return true;
-};
-EventEmitter.prototype.addListener = function (type, listener) {
-    var m;
-    if (!isFunction(listener)) 
-        throw TypeError('listener must be a function');
-    if (!this._events) 
-        this._events = {};
-    // To avoid recursion in the case that type === "newListener"! Before
-    // adding it to the listeners, first emit "newListener".
-    if (this._events.newListener) 
-        this.emit('newListener', type, isFunction(listener.listener) ? listener.listener : listener);
-    if (!this._events[type]) 
-    // Optimize the case of one listener. Don't need the extra array object.
-        this._events[type] = listener;
-     else if (isObject(this._events[type])) 
-    // If we've already got an array, just append.
-        this._events[type].push(listener);
-     else 
-    // Adding the second element, need to change to array.
-        this._events[type] = [this._events[type],listener];
-    // Check for listener leak
-    if (isObject(this._events[type]) && !this._events[type].warned) {
-        if (!isUndefined(this._maxListeners)) {
-            m = this._maxListeners;
-        } else {
-            m = EventEmitter.defaultMaxListeners;
-        }
-        if (m && m > 0 && this._events[type].length > m) {
-            this._events[type].warned = true;
-            console.error('(node) warning: possible EventEmitter memory ' + 'leak detected. %d listeners added. ' + 'Use emitter.setMaxListeners() to increase limit.', this._events[type].length);
-            if (typeof console.trace === 'function') {
-                // not supported in IE 10
-                console.trace();
-            }
-        }
-    }
-    return this;
-};
-EventEmitter.prototype.on = EventEmitter.prototype.addListener;
-EventEmitter.prototype.once = function (type, listener) {
-    if (!isFunction(listener)) 
-        throw TypeError('listener must be a function');
-    var fired = false;
-    function g() {
-        this.removeListener(type, g);
-        if (!fired) {
-            fired = true;
-            listener.apply(this, arguments);
-        }
-    }
-    
-    g.listener = listener;
-    this.on(type, g);
-    return this;
-};
-// emits a 'removeListener' event iff the listener was removed
-EventEmitter.prototype.removeListener = function (type, listener) {
-    var list, position, length, i;
-    if (!isFunction(listener)) 
-        throw TypeError('listener must be a function');
-    if (!this._events || !this._events[type]) 
-        return this;
-    list = this._events[type];
-    length = list.length;
-    position = -1;
-    if (list === listener || isFunction(list.listener) && list.listener === listener) {
-        delete this._events[type];
-        if (this._events.removeListener) 
-            this.emit('removeListener', type, listener);
-    } else if (isObject(list)) {
-        for (i = length; i-- > 0; ) {
-            if (list[i] === listener || list[i].listener && list[i].listener === listener) {
-                position = i;
-                break;
-            }
-        }
-        if (position < 0) 
-            return this;
-        if (list.length === 1) {
-            list.length = 0;
-            delete this._events[type];
-        } else {
-            list.splice(position, 1);
-        }
-        if (this._events.removeListener) 
-            this.emit('removeListener', type, listener);
-    }
-    return this;
-};
-EventEmitter.prototype.removeAllListeners = function (type) {
-    var key, listeners;
-    if (!this._events) 
-        return this;
-    // not listening for removeListener, no need to emit
-    if (!this._events.removeListener) {
-        if (arguments.length === 0) 
-            this._events = {};
-         else if (this._events[type]) 
-            delete this._events[type];
-        return this;
-    }
-    // emit removeListener for all listeners on all events
-    if (arguments.length === 0) {
-        for (key in this._events) {
-            if (key === 'removeListener') 
-                continue;
-            this.removeAllListeners(key);
-        }
-        this.removeAllListeners('removeListener');
-        this._events = {};
-        return this;
-    }
-    listeners = this._events[type];
-    if (isFunction(listeners)) {
-        this.removeListener(type, listeners);
-    } else if (listeners) {
-        // LIFO order
-        while (listeners.length) 
-            this.removeListener(type, listeners[listeners.length - 1]);
-    }
-    delete this._events[type];
-    return this;
-};
-EventEmitter.prototype.listeners = function (type) {
-    var ret;
-    if (!this._events || !this._events[type]) 
-        ret = [];
-     else if (isFunction(this._events[type])) 
-        ret = [this._events[type]];
-     else 
-        ret = this._events[type].slice();
-    return ret;
-};
-EventEmitter.prototype.listenerCount = function (type) {
-    if (this._events) {
-        var evlistener = this._events[type];
-        if (isFunction(evlistener)) 
-            return 1;
-         else if (evlistener) 
-            return evlistener.length;
-    }
-    return 0;
-};
-EventEmitter.listenerCount = function (emitter, type) {
-    return emitter.listenerCount(type);
-};
-function isFunction(arg) {
-    return typeof arg === 'function';
-}
-
-function isNumber(arg) {
-    return typeof arg === 'number';
-}
-
-function isObject(arg) {
-    return typeof arg === 'object' && arg !== null;
-}
-
-function isUndefined(arg) {
-    return arg === void 0;
+    props = props || {};
+    var ratio = props.ratio || 56.25;
+    return html`
+    <div class="psr w100" style="padding-bottom: ${ratio}%">
+      <iframe
+        class="psa t0 l0 h100 w100 b0 r0"
+        src="https://www.youtube.com/embed/${id}?rel=0&amp;theme=dark&amp;controls=1&amp;showinfo=0"
+        frameborder="0"
+        gesture="media"
+        allow="encrypted-media"
+        allowfullscreen
+      ></iframe>
+    </div>
+  `;
 }
 
 
 }).call(this,require('_process'))
-},{"_process":5}],4:[function(require,module,exports){
+},{"_process":108,"choo/html":6}],2:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-// resolves . and .. elements in a path array with directory names there
-// must be no slashes, empty elements, or device names (c:\) in the array
-// (so also no leading and trailing slashes - it does not distinguish
-// relative and absolute paths)
-function normalizeArray(parts, allowAboveRoot) {
-    // if the path tries to go above the root, `up` ends up > 0
-    var up = 0;
-    for (var i = parts.length - 1;i >= 0; i--) {
-        var last = parts[i];
-        if (last === '.') {
-            parts.splice(i, 1);
-        } else if (last === '..') {
-            parts.splice(i, 1);
-            up++;
-        } else if (up) {
-            parts.splice(i, 1);
-            up--;
-        }
-    }
-    // if the path is allowed to go above the root, restore leading ..s
-    if (allowAboveRoot) {
-        for (; up--; up) {
-            parts.unshift('..');
-        }
-    }
-    return parts;
-}
-
-// Split a filename into [root, dir, basename, ext], unix version
-// 'root' is just a slash, or nothing.
-var splitPathRe = /^(\/?|)([\s\S]*?)((?:\.{1,2}|[^\/]+?|)(\.[^.\/]*|))(?:[\/]*)$/;
-var splitPath = function (filename) {
-    return splitPathRe.exec(filename).slice(1);
-};
-// path.resolve([from ...], to)
-// posix version
-exports.resolve = function () {
-    var resolvedPath = '', resolvedAbsolute = false;
-    for (var i = arguments.length - 1;i >= -1 && !resolvedAbsolute; i--) {
-        var path = i >= 0 ? arguments[i] : process.cwd();
-        // Skip empty and invalid entries
-        if (typeof path !== 'string') {
-            throw new TypeError('Arguments to path.resolve must be strings');
-        } else if (!path) {
-            continue;
-        }
-        resolvedPath = path + '/' + resolvedPath;
-        resolvedAbsolute = path.charAt(0) === '/';
-    }
-    // At this point the path should be resolved to a full absolute path, but
-    // handle relative paths to be safe (might happen when process.cwd() fails)
-    // Normalize the path
-    resolvedPath = normalizeArray(filter(resolvedPath.split('/'), function (p) {
-        return !(!p);
-    }), !resolvedAbsolute).join('/');
-    return (resolvedAbsolute ? '/' : '') + resolvedPath || '.';
-};
-// path.normalize(path)
-// posix version
-exports.normalize = function (path) {
-    var isAbsolute = exports.isAbsolute(path), trailingSlash = substr(path, -1) === '/';
-    // Normalize the path
-    path = normalizeArray(filter(path.split('/'), function (p) {
-        return !(!p);
-    }), !isAbsolute).join('/');
-    if (!path && !isAbsolute) {
-        path = '.';
-    }
-    if (path && trailingSlash) {
-        path += '/';
-    }
-    return (isAbsolute ? '/' : '') + path;
-};
-// posix version
-exports.isAbsolute = function (path) {
-    return path.charAt(0) === '/';
-};
-// posix version
-exports.join = function () {
-    var paths = Array.prototype.slice.call(arguments, 0);
-    return exports.normalize(filter(paths, function (p, index) {
-        if (typeof p !== 'string') {
-            throw new TypeError('Arguments to path.join must be strings');
-        }
-        return p;
-    }).join('/'));
-};
-// path.relative(from, to)
-// posix version
-exports.relative = function (from, to) {
-    from = exports.resolve(from).substr(1);
-    to = exports.resolve(to).substr(1);
-    function trim(arr) {
-        var start = 0;
-        for (; start < arr.length; start++) {
-            if (arr[start] !== '') 
-                break;
-        }
-        var end = arr.length - 1;
-        for (; end >= 0; end--) {
-            if (arr[end] !== '') 
-                break;
-        }
-        if (start > end) 
-            return [];
-        return arr.slice(start, end - start + 1);
-    }
-    
-    var fromParts = trim(from.split('/'));
-    var toParts = trim(to.split('/'));
-    var length = Math.min(fromParts.length, toParts.length);
-    var samePartsLength = length;
-    for (var i = 0;i < length; i++) {
-        if (fromParts[i] !== toParts[i]) {
-            samePartsLength = i;
-            break;
-        }
-    }
-    var outputParts = [];
-    for (var i = samePartsLength;i < fromParts.length; i++) {
-        outputParts.push('..');
-    }
-    outputParts = outputParts.concat(toParts.slice(samePartsLength));
-    return outputParts.join('/');
-};
-exports.sep = '/';
-exports.delimiter = ':';
-exports.dirname = function (path) {
-    var result = splitPath(path), root = result[0], dir = result[1];
-    if (!root && !dir) {
-        // No dirname whatsoever
-        return '.';
-    }
-    if (dir) {
-        // It has a dirname, strip trailing slash
-        dir = dir.substr(0, dir.length - 1);
-    }
-    return root + dir;
-};
-exports.basename = function (path, ext) {
-    var f = splitPath(path)[2];
-    // TODO: make this comparison case-insensitive on windows?
-    if (ext && f.substr(-1 * ext.length) === ext) {
-        f = f.substr(0, f.length - ext.length);
-    }
-    return f;
-};
-exports.extname = function (path) {
-    return splitPath(path)[3];
-};
-function filter(xs, f) {
-    if (xs.filter) 
-        return xs.filter(f);
-    var res = [];
-    for (var i = 0;i < xs.length; i++) {
-        if (f(xs[i], i, xs)) 
-            res.push(xs[i]);
-    }
-    return res;
-}
-
-// String.prototype.substr - negative index don't work in IE8
-var substr = 'ab'.substr(-1) === 'b' ? function (str, start, len) {
-    return str.substr(start, len);
-} : function (str, start, len) {
-    if (start < 0) 
-        start = str.length + start;
-    return str.substr(start, len);
-};
+var css = 0;
+(null || true) && "_2a078321";
+(null || true) && "_fe377748";
 
 
 }).call(this,require('_process'))
-},{"_process":5}],5:[function(require,module,exports){
-Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
-// shim for using process in browser
-var process = module.exports = {};
-// cached from whatever global is present so that test runners that stub it
-// don't break things.  But we need to wrap it in a try catch in case it is
-// wrapped in strict mode code which doesn't define any globals.  It's inside a
-// function because try/catches deoptimize in certain engines.
-var cachedSetTimeout;
-var cachedClearTimeout;
-function defaultSetTimout() {
-    throw new Error('setTimeout has not been defined');
-}
-
-function defaultClearTimeout() {
-    throw new Error('clearTimeout has not been defined');
-}
-
-(function () {
-    try {
-        if (typeof setTimeout === 'function') {
-            cachedSetTimeout = setTimeout;
-        } else {
-            cachedSetTimeout = defaultSetTimout;
-        }
-    } catch (e) {
-        cachedSetTimeout = defaultSetTimout;
-    }
-    try {
-        if (typeof clearTimeout === 'function') {
-            cachedClearTimeout = clearTimeout;
-        } else {
-            cachedClearTimeout = defaultClearTimeout;
-        }
-    } catch (e) {
-        cachedClearTimeout = defaultClearTimeout;
-    }
-})();
-function runTimeout(fun) {
-    if (cachedSetTimeout === setTimeout) {
-        //normal enviroments in sane situations
-        return setTimeout(fun, 0);
-    }
-    // if setTimeout wasn't available but was latter defined
-    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-        cachedSetTimeout = setTimeout;
-        return setTimeout(fun, 0);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedSetTimeout(fun, 0);
-    } catch (e) {
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-            return cachedSetTimeout.call(null, fun, 0);
-        } catch (e) {
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-            return cachedSetTimeout.call(this, fun, 0);
-        }
-    }
-}
-
-function runClearTimeout(marker) {
-    if (cachedClearTimeout === clearTimeout) {
-        //normal enviroments in sane situations
-        return clearTimeout(marker);
-    }
-    // if clearTimeout wasn't available but was latter defined
-    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-        cachedClearTimeout = clearTimeout;
-        return clearTimeout(marker);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedClearTimeout(marker);
-    } catch (e) {
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-            return cachedClearTimeout.call(null, marker);
-        } catch (e) {
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-            return cachedClearTimeout.call(this, marker);
-        }
-    }
-}
-
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-function cleanUpNextTick() {
-    if (!draining || !currentQueue) {
-        return;
-    }
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = runTimeout(cleanUpNextTick);
-    draining = true;
-    var len = queue.length;
-    while (len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    runClearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1;i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        runTimeout(drainQueue);
-    }
-};
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; //  empty string to avoid regexp issues
-process.versions = {};
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-process.prependListener = noop;
-process.prependOnceListener = noop;
-process.listeners = function (name) {
-    return [];
-};
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-process.cwd = function () {
-    return '/';
-};
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function () {
-    return 0;
-};
-
-
-},{}],6:[function(require,module,exports){
-(function (process){
-Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
-if (typeof Object.create === 'function') {
-    // implementation from standard node.js 'util' module
-    module.exports = function inherits(ctor, superCtor) {
-        ctor.super_ = superCtor;
-        ctor.prototype = Object.create(superCtor.prototype, {
-            constructor: {
-                value: ctor,
-                enumerable: false,
-                writable: true,
-                configurable: true
-            }
-        });
-    };
-} else {
-    // old school shim for old browsers
-    module.exports = function inherits(ctor, superCtor) {
-        ctor.super_ = superCtor;
-        var TempCtor = function () {};
-        TempCtor.prototype = superCtor.prototype;
-        ctor.prototype = new TempCtor();
-        ctor.prototype.constructor = ctor;
-    };
-}
-
-
-}).call(this,require('_process'))
-},{"_process":5}],7:[function(require,module,exports){
-(function (process){
-Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
-module.exports = function isBuffer(arg) {
-    return arg && typeof arg === 'object' && typeof arg.copy === 'function' && typeof arg.fill === 'function' && typeof arg.readUInt8 === 'function';
-};
-
-
-}).call(this,require('_process'))
-},{"_process":5}],8:[function(require,module,exports){
-(function (process,global){
-Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-var formatRegExp = /%[sdj%]/g;
-exports.format = function (f) {
-    if (!isString(f)) {
-        var objects = [];
-        for (var i = 0;i < arguments.length; i++) {
-            objects.push(inspect(arguments[i]));
-        }
-        return objects.join(' ');
-    }
-    var i = 1;
-    var args = arguments;
-    var len = args.length;
-    var str = String(f).replace(formatRegExp, function (x) {
-        if (x === '%%') 
-            return '%';
-        if (i >= len) 
-            return x;
-        switch (x) {
-            case '%s':
-                return String(args[i++]);
-            case '%d':
-                return Number(args[i++]);
-            case '%j':
-                try {
-                    return JSON.stringify(args[i++]);
-                } catch (_) {
-                    return '[Circular]';
-                }
-            default:
-                return x;
-        }
-    });
-    for (var x = args[i];i < len; x = args[++i]) {
-        if (isNull(x) || !isObject(x)) {
-            str += ' ' + x;
-        } else {
-            str += ' ' + inspect(x);
-        }
-    }
-    return str;
-};
-// Mark that a method should not be used.
-// Returns a modified function which warns once by default.
-// If --no-deprecation is set, then it is a no-op.
-exports.deprecate = function (fn, msg) {
-    // Allow for deprecating things in the process of starting up.
-    if (isUndefined(global.process)) {
-        return function () {
-            return exports.deprecate(fn, msg).apply(this, arguments);
-        };
-    }
-    if (process.noDeprecation === true) {
-        return fn;
-    }
-    var warned = false;
-    function deprecated() {
-        if (!warned) {
-            if (process.throwDeprecation) {
-                throw new Error(msg);
-            } else if (process.traceDeprecation) {
-                console.trace(msg);
-            } else {
-                console.error(msg);
-            }
-            warned = true;
-        }
-        return fn.apply(this, arguments);
-    }
-    
-    return deprecated;
-};
-var debugs = {};
-var debugEnviron;
-exports.debuglog = function (set) {
-    if (isUndefined(debugEnviron)) 
-        debugEnviron = process.env.NODE_DEBUG || '';
-    set = set.toUpperCase();
-    if (!debugs[set]) {
-        if (new RegExp('\\b' + set + '\\b', 'i').test(debugEnviron)) {
-            var pid = process.pid;
-            debugs[set] = function () {
-                var msg = exports.format.apply(exports, arguments);
-                console.error('%s %d: %s', set, pid, msg);
-            };
-        } else {
-            debugs[set] = function () {};
-        }
-    }
-    return debugs[set];
-};
-/**
- * Echos the value of a value. Trys to print the value out
- * in the best way possible given the different types.
- *
- * @param {Object} obj The object to print out.
- * @param {Object} opts Optional options object that alters the output.
- */
-/* legacy: obj, showHidden, depth, colors*/
-function inspect(obj, opts) {
-    // default options
-    var ctx = {
-        seen: [],
-        stylize: stylizeNoColor
-    };
-    // legacy...
-    if (arguments.length >= 3) 
-        ctx.depth = arguments[2];
-    if (arguments.length >= 4) 
-        ctx.colors = arguments[3];
-    if (isBoolean(opts)) {
-        // legacy...
-        ctx.showHidden = opts;
-    } else if (opts) {
-        // got an "options" object
-        exports._extend(ctx, opts);
-    }
-    // set default options
-    if (isUndefined(ctx.showHidden)) 
-        ctx.showHidden = false;
-    if (isUndefined(ctx.depth)) 
-        ctx.depth = 2;
-    if (isUndefined(ctx.colors)) 
-        ctx.colors = false;
-    if (isUndefined(ctx.customInspect)) 
-        ctx.customInspect = true;
-    if (ctx.colors) 
-        ctx.stylize = stylizeWithColor;
-    return formatValue(ctx, obj, ctx.depth);
-}
-
-exports.inspect = inspect;
-// http://en.wikipedia.org/wiki/ANSI_escape_code#graphics
-inspect.colors = {
-    'bold': [1,22],
-    'italic': [3,23],
-    'underline': [4,24],
-    'inverse': [7,27],
-    'white': [37,39],
-    'grey': [90,39],
-    'black': [30,39],
-    'blue': [34,39],
-    'cyan': [36,39],
-    'green': [32,39],
-    'magenta': [35,39],
-    'red': [31,39],
-    'yellow': [33,39]
-};
-// Don't use 'blue' not visible on cmd.exe
-inspect.styles = {
-    'special': 'cyan',
-    'number': 'yellow',
-    'boolean': 'yellow',
-    'undefined': 'grey',
-    'null': 'bold',
-    'string': 'green',
-    'date': 'magenta',
-    // "name": intentionally not styling
-    'regexp': 'red'
-};
-function stylizeWithColor(str, styleType) {
-    var style = inspect.styles[styleType];
-    if (style) {
-        return '\u001b[' + inspect.colors[style][0] + 'm' + str + '\u001b[' + inspect.colors[style][1] + 'm';
-    } else {
-        return str;
-    }
-}
-
-function stylizeNoColor(str, styleType) {
-    return str;
-}
-
-function arrayToHash(array) {
-    var hash = {};
-    array.forEach(function (val, idx) {
-        hash[val] = true;
-    });
-    return hash;
-}
-
-function formatValue(ctx, value, recurseTimes) {
-    // Provide a hook for user-specified inspect functions.
-    // Check that value is an object with an inspect function on it
-    // Filter out the util module, it's inspect function is special
-    // Also filter out any prototype objects using the circular check.
-    if (ctx.customInspect && value && isFunction(value.inspect) && value.inspect !== exports.inspect && !(value.constructor && value.constructor.prototype === value)) {
-        var ret = value.inspect(recurseTimes, ctx);
-        if (!isString(ret)) {
-            ret = formatValue(ctx, ret, recurseTimes);
-        }
-        return ret;
-    }
-    // Primitive types cannot have properties
-    var primitive = formatPrimitive(ctx, value);
-    if (primitive) {
-        return primitive;
-    }
-    // Look up the keys of the object.
-    var keys = Object.keys(value);
-    var visibleKeys = arrayToHash(keys);
-    if (ctx.showHidden) {
-        keys = Object.getOwnPropertyNames(value);
-    }
-    // IE doesn't make error fields non-enumerable
-    // http://msdn.microsoft.com/en-us/library/ie/dww52sbt(v=vs.94).aspx
-    if (isError(value) && (keys.indexOf('message') >= 0 || keys.indexOf('description') >= 0)) {
-        return formatError(value);
-    }
-    // Some type of object without properties can be shortcutted.
-    if (keys.length === 0) {
-        if (isFunction(value)) {
-            var name = value.name ? ': ' + value.name : '';
-            return ctx.stylize('[Function' + name + ']', 'special');
-        }
-        if (isRegExp(value)) {
-            return ctx.stylize(RegExp.prototype.toString.call(value), 'regexp');
-        }
-        if (isDate(value)) {
-            return ctx.stylize(Date.prototype.toString.call(value), 'date');
-        }
-        if (isError(value)) {
-            return formatError(value);
-        }
-    }
-    var base = '', array = false, braces = ['{','}'];
-    // Make Array say that they are Array
-    if (isArray(value)) {
-        array = true;
-        braces = ['[',']'];
-    }
-    // Make functions say that they are functions
-    if (isFunction(value)) {
-        var n = value.name ? ': ' + value.name : '';
-        base = ' [Function' + n + ']';
-    }
-    // Make RegExps say that they are RegExps
-    if (isRegExp(value)) {
-        base = ' ' + RegExp.prototype.toString.call(value);
-    }
-    // Make dates with properties first say the date
-    if (isDate(value)) {
-        base = ' ' + Date.prototype.toUTCString.call(value);
-    }
-    // Make error with message first say the error
-    if (isError(value)) {
-        base = ' ' + formatError(value);
-    }
-    if (keys.length === 0 && (!array || value.length == 0)) {
-        return braces[0] + base + braces[1];
-    }
-    if (recurseTimes < 0) {
-        if (isRegExp(value)) {
-            return ctx.stylize(RegExp.prototype.toString.call(value), 'regexp');
-        } else {
-            return ctx.stylize('[Object]', 'special');
-        }
-    }
-    ctx.seen.push(value);
-    var output;
-    if (array) {
-        output = formatArray(ctx, value, recurseTimes, visibleKeys, keys);
-    } else {
-        output = keys.map(function (key) {
-            return formatProperty(ctx, value, recurseTimes, visibleKeys, key, array);
-        });
-    }
-    ctx.seen.pop();
-    return reduceToSingleString(output, base, braces);
-}
-
-function formatPrimitive(ctx, value) {
-    if (isUndefined(value)) 
-        return ctx.stylize('undefined', 'undefined');
-    if (isString(value)) {
-        var simple = '\'' + JSON.stringify(value).replace(/^"|"$/g, '').replace(/'/g, "\\'").replace(/\\"/g, '"') + '\'';
-        return ctx.stylize(simple, 'string');
-    }
-    if (isNumber(value)) 
-        return ctx.stylize('' + value, 'number');
-    if (isBoolean(value)) 
-        return ctx.stylize('' + value, 'boolean');
-    // For some reason typeof null is "object", so special case here.
-    if (isNull(value)) 
-        return ctx.stylize('null', 'null');
-}
-
-function formatError(value) {
-    return '[' + Error.prototype.toString.call(value) + ']';
-}
-
-function formatArray(ctx, value, recurseTimes, visibleKeys, keys) {
-    var output = [];
-    for (var i = 0, l = value.length;i < l; ++i) {
-        if (hasOwnProperty(value, String(i))) {
-            output.push(formatProperty(ctx, value, recurseTimes, visibleKeys, String(i), true));
-        } else {
-            output.push('');
-        }
-    }
-    keys.forEach(function (key) {
-        if (!key.match(/^\d+$/)) {
-            output.push(formatProperty(ctx, value, recurseTimes, visibleKeys, key, true));
-        }
-    });
-    return output;
-}
-
-function formatProperty(ctx, value, recurseTimes, visibleKeys, key, array) {
-    var name, str, desc;
-    desc = Object.getOwnPropertyDescriptor(value, key) || {
-        value: value[key]
-    };
-    if (desc.get) {
-        if (desc.set) {
-            str = ctx.stylize('[Getter/Setter]', 'special');
-        } else {
-            str = ctx.stylize('[Getter]', 'special');
-        }
-    } else {
-        if (desc.set) {
-            str = ctx.stylize('[Setter]', 'special');
-        }
-    }
-    if (!hasOwnProperty(visibleKeys, key)) {
-        name = '[' + key + ']';
-    }
-    if (!str) {
-        if (ctx.seen.indexOf(desc.value) < 0) {
-            if (isNull(recurseTimes)) {
-                str = formatValue(ctx, desc.value, null);
-            } else {
-                str = formatValue(ctx, desc.value, recurseTimes - 1);
-            }
-            if (str.indexOf('\n') > -1) {
-                if (array) {
-                    str = str.split('\n').map(function (line) {
-                        return '  ' + line;
-                    }).join('\n').substr(2);
-                } else {
-                    str = '\n' + str.split('\n').map(function (line) {
-                        return '   ' + line;
-                    }).join('\n');
-                }
-            }
-        } else {
-            str = ctx.stylize('[Circular]', 'special');
-        }
-    }
-    if (isUndefined(name)) {
-        if (array && key.match(/^\d+$/)) {
-            return str;
-        }
-        name = JSON.stringify('' + key);
-        if (name.match(/^"([a-zA-Z_][a-zA-Z_0-9]*)"$/)) {
-            name = name.substr(1, name.length - 2);
-            name = ctx.stylize(name, 'name');
-        } else {
-            name = name.replace(/'/g, "\\'").replace(/\\"/g, '"').replace(/(^"|"$)/g, "'");
-            name = ctx.stylize(name, 'string');
-        }
-    }
-    return name + ': ' + str;
-}
-
-function reduceToSingleString(output, base, braces) {
-    var numLinesEst = 0;
-    var length = output.reduce(function (prev, cur) {
-        numLinesEst++;
-        if (cur.indexOf('\n') >= 0) 
-            numLinesEst++;
-        return prev + cur.replace(/\u001b\[\d\d?m/g, '').length + 1;
-    }, 0);
-    if (length > 60) {
-        return braces[0] + (base === '' ? '' : base + '\n ') + ' ' + output.join(',\n  ') + ' ' + braces[1];
-    }
-    return braces[0] + base + ' ' + output.join(', ') + ' ' + braces[1];
-}
-
-// NOTE: These type checking functions intentionally don't use `instanceof`
-// because it is fragile and can be easily faked with `Object.create()`.
-function isArray(ar) {
-    return Array.isArray(ar);
-}
-
-exports.isArray = isArray;
-function isBoolean(arg) {
-    return typeof arg === 'boolean';
-}
-
-exports.isBoolean = isBoolean;
-function isNull(arg) {
-    return arg === null;
-}
-
-exports.isNull = isNull;
-function isNullOrUndefined(arg) {
-    return arg == null;
-}
-
-exports.isNullOrUndefined = isNullOrUndefined;
-function isNumber(arg) {
-    return typeof arg === 'number';
-}
-
-exports.isNumber = isNumber;
-function isString(arg) {
-    return typeof arg === 'string';
-}
-
-exports.isString = isString;
-function isSymbol(arg) {
-    return typeof arg === 'symbol';
-}
-
-exports.isSymbol = isSymbol;
-function isUndefined(arg) {
-    return arg === void 0;
-}
-
-exports.isUndefined = isUndefined;
-function isRegExp(re) {
-    return isObject(re) && objectToString(re) === '[object RegExp]';
-}
-
-exports.isRegExp = isRegExp;
-function isObject(arg) {
-    return typeof arg === 'object' && arg !== null;
-}
-
-exports.isObject = isObject;
-function isDate(d) {
-    return isObject(d) && objectToString(d) === '[object Date]';
-}
-
-exports.isDate = isDate;
-function isError(e) {
-    return isObject(e) && (objectToString(e) === '[object Error]' || e instanceof Error);
-}
-
-exports.isError = isError;
-function isFunction(arg) {
-    return typeof arg === 'function';
-}
-
-exports.isFunction = isFunction;
-function isPrimitive(arg) {
-    return arg === null || typeof arg === 'boolean' || typeof arg === 'number' || typeof arg === 'string' || typeof arg === 'symbol' || typeof arg === 'undefined'; //  ES6 symbol
-}
-
-exports.isPrimitive = isPrimitive;
-exports.isBuffer = require('./support/isBuffer');
-function objectToString(o) {
-    return Object.prototype.toString.call(o);
-}
-
-function pad(n) {
-    return n < 10 ? '0' + n.toString(10) : n.toString(10);
-}
-
-var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-// 26 Feb 16:19:34
-function timestamp() {
-    var d = new Date();
-    var time = [pad(d.getHours()),pad(d.getMinutes()),pad(d.getSeconds())].join(':');
-    return [d.getDate(),months[d.getMonth()],time].join(' ');
-}
-
-// log is just a thin wrapper to console.log that prepends a timestamp
-exports.log = function () {
-    console.log('%s - %s', timestamp(), exports.format.apply(exports, arguments));
-};
-/**
- * Inherit the prototype methods from one constructor into another.
- *
- * The Function.prototype.inherits from lang.js rewritten as a standalone
- * function (not on Function.prototype). NOTE: If this file is to be loaded
- * during bootstrapping this function needs to be rewritten using some native
- * functions as prototype setup using normal JavaScript does not work as
- * expected during bootstrapping (see mirror.js in r114903).
- *
- * @param {function} ctor Constructor function which needs to inherit the
- *     prototype.
- * @param {function} superCtor Constructor function to inherit prototype from.
- */
-exports.inherits = require('inherits');
-exports._extend = function (origin, add) {
-    // Don't do anything if add isn't an object
-    if (!add || !isObject(add)) 
-        return origin;
-    var keys = Object.keys(add);
-    var i = keys.length;
-    while (i--) {
-        origin[keys[i]] = add[keys[i]];
-    }
-    return origin;
-};
-function hasOwnProperty(obj, prop) {
-    return Object.prototype.hasOwnProperty.call(obj, prop);
-}
-
-
-}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":7,"_process":5,"inherits":6}],9:[function(require,module,exports){
+},{"_process":108,"sheetify/insert":27}],3:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 var html = require('choo/html');
 var choo = require('choo');
+require('./design');
 var app = choo();
-app.use(require('./stores/content')());
+app.use(require('./plugins/scroll'));
+app.use(require('./stores/content'));
 app.route('*', require('./views/wrapper'));
 app.mount('body');
 
 
 }).call(this,require('_process'))
-},{"./stores/content":36,"./views/wrapper":39,"_process":5,"choo":13,"choo/html":12}],10:[function(require,module,exports){
+},{"./design":2,"./plugins/scroll":32,"./stores/content":33,"./views/wrapper":38,"_process":108,"choo":7,"choo/html":6}],4:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 var trailingNewlineRegex = /\n[\s]+$/;
@@ -1746,7 +143,7 @@ module.exports = function appendChild(el, childs) {
 
 
 }).call(this,require('_process'))
-},{"_process":5}],11:[function(require,module,exports){
+},{"_process":108}],5:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 var hyperx = require('hyperx');
@@ -1837,14 +234,14 @@ module.exports.createElement = belCreateElement;
 
 
 }).call(this,require('_process'))
-},{"./appendChild":10,"_process":5,"hyperx":16}],12:[function(require,module,exports){
+},{"./appendChild":4,"_process":108,"hyperx":10}],6:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 module.exports = require('bel');
 
 
 }).call(this,require('_process'))
-},{"_process":5,"bel":11}],13:[function(require,module,exports){
+},{"_process":108,"bel":5}],7:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 var scrollToAnchor = require('scroll-to-anchor');
@@ -2026,7 +423,7 @@ Choo.prototype.toString = function (location, state) {
 
 
 }).call(this,require('_process'))
-},{"_process":5,"assert":2,"document-ready":14,"nanobus":18,"nanohref":19,"nanolocation":20,"nanomorph":21,"nanoquery":24,"nanoraf":25,"nanorouter":26,"nanotiming":27,"scroll-to-anchor":31,"xtend":34}],14:[function(require,module,exports){
+},{"_process":108,"assert":104,"document-ready":8,"nanobus":13,"nanohref":14,"nanolocation":15,"nanomorph":16,"nanoquery":19,"nanoraf":20,"nanorouter":21,"nanotiming":22,"scroll-to-anchor":26,"xtend":30}],8:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 'use strict';
@@ -2045,7 +442,7 @@ function ready(callback) {
 
 
 }).call(this,require('_process'))
-},{"_process":5,"assert":2}],15:[function(require,module,exports){
+},{"_process":108,"assert":104}],9:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 module.exports = attributeToProperty;
@@ -2068,7 +465,7 @@ function attributeToProperty(h) {
 
 
 }).call(this,require('_process'))
-},{"_process":5}],16:[function(require,module,exports){
+},{"_process":108}],10:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 var attrToProp = require('hyperscript-attribute-to-property');
@@ -2355,7 +752,63 @@ function selfClosing(tag) {
 
 
 }).call(this,require('_process'))
-},{"_process":5,"hyperscript-attribute-to-property":15}],17:[function(require,module,exports){
+},{"_process":108,"hyperscript-attribute-to-property":9}],11:[function(require,module,exports){
+(function (process){
+Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
+var containers = []; //  will store container HTMLElement references
+var styleElements = []; //  will store {prepend: HTMLElement, append: HTMLElement}
+var usage = 'insert-css: You need to provide a CSS string. Usage: insertCss(cssString[, options]).';
+function insertCss(css, options) {
+    options = options || {};
+    if (css === undefined) {
+        throw new Error(usage);
+    }
+    var position = options.prepend === true ? 'prepend' : 'append';
+    var container = options.container !== undefined ? options.container : document.querySelector('head');
+    var containerId = containers.indexOf(container);
+    // first time we see this container, create the necessary entries
+    if (containerId === -1) {
+        containerId = containers.push(container) - 1;
+        styleElements[containerId] = {};
+    }
+    // try to get the correponding container + position styleElement, create it otherwise
+    var styleElement;
+    if (styleElements[containerId] !== undefined && styleElements[containerId][position] !== undefined) {
+        styleElement = styleElements[containerId][position];
+    } else {
+        styleElement = (styleElements[containerId][position] = createStyleElement());
+        if (position === 'prepend') {
+            container.insertBefore(styleElement, container.childNodes[0]);
+        } else {
+            container.appendChild(styleElement);
+        }
+    }
+    // strip potential UTF-8 BOM if css was read from a file
+    if (css.charCodeAt(0) === 0xFEFF) {
+        css = css.substr(1, css.length);
+    }
+    // actually add the stylesheet
+    if (styleElement.styleSheet) {
+        styleElement.styleSheet.cssText += css;
+    } else {
+        styleElement.textContent += css;
+    }
+    return styleElement;
+}
+
+;
+function createStyleElement() {
+    var styleElement = document.createElement('style');
+    styleElement.setAttribute('type', 'text/css');
+    return styleElement;
+}
+
+module.exports = insertCss;
+module.exports.insertCss = insertCss;
+
+
+}).call(this,require('_process'))
+},{"_process":108}],12:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 assert.notEqual = notEqual;
@@ -2382,7 +835,7 @@ function assert(t, m) {
 
 
 }).call(this,require('_process'))
-},{"_process":5}],18:[function(require,module,exports){
+},{"_process":108}],13:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 var splice = require('remove-array-items');
@@ -2533,7 +986,7 @@ Nanobus.prototype._emit = function (arr, eventName, data, uuid) {
 
 
 }).call(this,require('_process'))
-},{"_process":5,"assert":2,"nanotiming":27,"remove-array-items":30}],19:[function(require,module,exports){
+},{"_process":108,"assert":104,"nanotiming":22,"remove-array-items":25}],14:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 var assert = require('assert');
@@ -2567,7 +1020,7 @@ function href(cb, root) {
 
 
 }).call(this,require('_process'))
-},{"_process":5,"assert":2}],20:[function(require,module,exports){
+},{"_process":108,"assert":104}],15:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 var assert = require('assert');
@@ -2581,7 +1034,7 @@ function nanolocation() {
 
 
 }).call(this,require('_process'))
-},{"_process":5,"assert":2}],21:[function(require,module,exports){
+},{"_process":108,"assert":104}],16:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 var assert = require('assert');
@@ -2728,7 +1181,7 @@ function same(a, b) {
 
 
 }).call(this,require('_process'))
-},{"./lib/morph":23,"_process":5,"assert":17}],22:[function(require,module,exports){
+},{"./lib/morph":18,"_process":108,"assert":12}],17:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 // attribute events (can be set with attributes)
@@ -2742,7 +1195,7 @@ module.exports = ['onclick','ondblclick','onmousedown','onmouseup','onmouseover'
 
 
 }).call(this,require('_process'))
-},{"_process":5}],23:[function(require,module,exports){
+},{"_process":108}],18:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 var events = require('./events');
@@ -2899,7 +1352,7 @@ function updateAttribute(newNode, oldNode, name) {
 
 
 }).call(this,require('_process'))
-},{"./events":22,"_process":5}],24:[function(require,module,exports){
+},{"./events":17,"_process":108}],19:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 var reg = /([^?=&]+)(=([^&]*))?/g;
@@ -2916,7 +1369,7 @@ function qs(url) {
 
 
 }).call(this,require('_process'))
-},{"_process":5,"assert":17}],25:[function(require,module,exports){
+},{"_process":108,"assert":12}],20:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 'use strict';
@@ -2950,7 +1403,7 @@ function nanoraf(render, raf) {
 
 
 }).call(this,require('_process'))
-},{"_process":5,"assert":2}],26:[function(require,module,exports){
+},{"_process":108,"assert":104}],21:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 var wayfarer = require('wayfarer');
@@ -3008,7 +1461,7 @@ function pathname(route, isElectron) {
 
 
 }).call(this,require('_process'))
-},{"_process":5,"wayfarer":32}],27:[function(require,module,exports){
+},{"_process":108,"wayfarer":28}],22:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 var assert = require('assert');
@@ -3051,7 +1504,7 @@ function noop(cb) {
 
 
 }).call(this,require('_process'))
-},{"./lib/on-idle":28,"_process":5,"assert":2}],28:[function(require,module,exports){
+},{"./lib/on-idle":23,"_process":108,"assert":104}],23:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 var assert = require('assert');
@@ -3083,7 +1536,7 @@ function onIdle(cb, opts) {
 
 
 }).call(this,require('_process'))
-},{"_process":5,"assert":2}],29:[function(require,module,exports){
+},{"_process":108,"assert":104}],24:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 'use strict';
@@ -3098,7 +1551,7 @@ module.exports = function (obj) {
 
 
 }).call(this,require('_process'))
-},{"_process":5}],30:[function(require,module,exports){
+},{"_process":108}],25:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 'use strict';
@@ -3125,7 +1578,7 @@ module.exports = function removeItems(arr, startIdx, removeCount) {
 
 
 }).call(this,require('_process'))
-},{"_process":5}],31:[function(require,module,exports){
+},{"_process":108}],26:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 module.exports = scrollToAnchor;
@@ -3141,7 +1594,14 @@ function scrollToAnchor(anchor, options) {
 
 
 }).call(this,require('_process'))
-},{"_process":5}],32:[function(require,module,exports){
+},{"_process":108}],27:[function(require,module,exports){
+(function (process){
+Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
+module.exports = require('insert-css');
+
+
+}).call(this,require('_process'))
+},{"_process":108,"insert-css":11}],28:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 var assert = require('assert');
@@ -3202,7 +1662,7 @@ function Wayfarer(dft) {
 
 
 }).call(this,require('_process'))
-},{"./trie":33,"_process":5,"assert":2}],33:[function(require,module,exports){
+},{"./trie":29,"_process":108,"assert":104}],29:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 var mutate = require('xtend/mutable');
@@ -3341,7 +1801,7 @@ Trie.prototype.mount = function (route, trie) {
 
 
 }).call(this,require('_process'))
-},{"_process":5,"assert":2,"xtend":34,"xtend/mutable":35}],34:[function(require,module,exports){
+},{"_process":108,"assert":104,"xtend":30,"xtend/mutable":31}],30:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 module.exports = extend;
@@ -3361,7 +1821,7 @@ function extend() {
 
 
 }).call(this,require('_process'))
-},{"_process":5}],35:[function(require,module,exports){
+},{"_process":108}],31:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 module.exports = extend;
@@ -3380,7 +1840,19 @@ function extend(target) {
 
 
 }).call(this,require('_process'))
-},{"_process":5}],36:[function(require,module,exports){
+},{"_process":108}],32:[function(require,module,exports){
+(function (process){
+Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
+module.exports = plugin;
+function plugin(state, emitter) {
+    emitter.on(state.events.PUSHSTATE, function () {
+        window.scrollTo(0, 0);
+    });
+}
+
+
+}).call(this,require('_process'))
+},{"_process":108}],33:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 var objectValues = require('object-values');
@@ -3389,88 +1861,247 @@ var hypha = require('hypha');
 var xtend = require('xtend');
 var view = require('../views/main');
 module.exports = store;
-function store(callback) {
-    return function content(state, emitter, app) {
-        return (function ($return, $error) {
-            var archive, options, files, content;
-            function getFiles() {
-                return (function ($return, $error) {
-                    var files;
-                    return archive.readdir('/content', {
-                        recursive: true
-                    }).then((function ($await_2) {
-                        files = $await_2;
-                        files = files.map(function (file) { //  funny hack //  funny hack
-                            return '/content/' + file;
-                        });
-                        return $return(files);
-                    }).$asyncbind(this, $error), $error);
-                }).$asyncbind(this, true);
-            }
-            
-            state.content = {};
-            state.loaded = false;
-            archive = new DatArchive(window.location.toString());
-            options = {
-                fs: archive,
-                parent: '/content'
-            };
-            function $Try_1_Post() {
-                state.loaded = true;
-                emitter.emit(state.events.RENDER);
-                if (typeof callback === 'function') 
-                    callback(content);
-                return $return(content);
-            }
-            
-            var $Try_1_Catch = (function (err) {
-                console.log(err);
-                return $Try_1_Post.call(this);
-            }).$asyncbind(this, $error);
-            try {
-                return getFiles().then((function ($await_3) {
-                    files = $await_3;
-                    return hypha.readFiles(files, '/content', options).then((function ($await_4) {
-                        content = $await_4;
-                        objectValues(content).forEach(function (page) {
-                            state.content[page.url] = page;
-                        });
-                        return $Try_1_Post.call(this);
-                    }).$asyncbind(this, $Try_1_Catch), $Try_1_Catch);
+function store(state, emitter, app) {
+    return (function ($return, $error) {
+        var archive, options, files, content;
+        function getFiles() {
+            return (function ($return, $error) {
+                var files;
+                return archive.readdir('/content', {
+                    recursive: true
+                }).then((function ($await_2) {
+                    files = $await_2;
+                    files = files.map(function (file) { //  funny hack
+                        return '/content/' + file;
+                    });
+                    return $return(files);
+                }).$asyncbind(this, $error), $error);
+            }).$asyncbind(this, true);
+        }
+        
+        state.content = {};
+        state.visited = [];
+        state.p2p = typeof DatArchive !== 'undefined';
+        state.loaded = false;
+        state.online = true;
+        archive = new DatArchive(window.location.toString());
+        options = {
+            fs: archive,
+            parent: '/content'
+        };
+        function $Try_1_Post() {
+            state.loaded = true;
+            emitter.emit(state.events.RENDER);
+            if (typeof callback === 'function') 
+                callback(content);
+            return $return(content);
+        }
+        
+        var $Try_1_Catch = (function (err) {
+            console.log(err);
+            return $Try_1_Post.call(this);
+        }).$asyncbind(this, $error);
+        try {
+            return getFiles().then((function ($await_3) {
+                files = $await_3;
+                return hypha.readFiles(files, '/content', options).then((function ($await_4) {
+                    content = $await_4;
+                    objectValues(content).forEach(function (page) {
+                        state.content[page.url] = page;
+                    });
+                    return $Try_1_Post.call(this);
                 }).$asyncbind(this, $Try_1_Catch), $Try_1_Catch);
-            } catch (err) {
-                $Try_1_Catch(err)
-            }
-        }).$asyncbind(this, true);
-    };
+            }).$asyncbind(this, $Try_1_Catch), $Try_1_Catch);
+        } catch (err) {
+            $Try_1_Catch(err)
+        }
+    }).$asyncbind(this, true);
 }
 
 
 }).call(this,require('_process'))
-},{"../views/main":38,"_process":5,"choo/html":12,"hypha":40,"object-values":29,"xtend":34}],37:[function(require,module,exports){
+},{"../views/main":36,"_process":108,"choo/html":6,"hypha":39,"object-values":24,"xtend":30}],34:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
-module.exports = {
-    default: require('./main')
-};
-
-
-}).call(this,require('_process'))
-},{"./main":38,"_process":5}],38:[function(require,module,exports){
-(function (process){
-Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
-var ov = require('object-values');
+var objectValues = require('object-values');
 var html = require('choo/html');
 module.exports = view;
 function view(state, emit) {
     var page = state.page;
-    console.log(page);
+    var info = state.content['/information'];
+    var interviews = objectValues(state.content['/interviews'].pages).map(function (page) {
+        return state.content[page.url];
+    });
+    var performances = objectValues(state.content['/performances'].pages).map(function (page) {
+        return state.content[page.url];
+    });
+    return html`
+    <div class="usn ttu">
+      <div class="psr">
+        <div class="x xw p0-5">
+          ${shuffle(renderPageImages(interviews)).splice(0, 12)}
+        </div>
+        <div class="x xjc xac psa t0 l0 r0 b0">
+          <div class="p2 psa t0 l0">
+            ${Math.floor(new Date() / 1000)}
+          </div>
+          <div class="p2 psa t0 r0">
+            <a href="/information" class="fc-white tdn">${info.title}</a>
+          </div>
+          <div class="p2 fs4 ha psr z2 tac">
+            ${shuffle(interviews).map(function (page, i) {
+        return [i === 0 ? html`<span class="curd">${state.page.heading}</span>` : '',
+            html`<div class="circle"></div>`,html`<a href="${page.url}" class="curp fc-white tdn">${page.title}</a>`];
+    })}
+          </div>
+        </div>
+      </div>
+      <div>
+        ${shuffle(performances).map(function (page, i) {
+        var images = objectValues(page.files).filter((file) => file.type === 'image');
+        var image = images[Math.floor(Math.random() * images.length)];
+        if (!image) 
+            return;
+        return html`
+            <a
+              href="${page.url}"
+              class="db psr curp fc-white tdn bgsc bgrn bgpc fs4"
+              style="background-image: url(${image.path})"
+            >
+              <div class="psa t0 l0 r0 b0 x xjc xac tac">
+                ${page.artist} @ ${page.venue}
+              </div>
+              <div style="padding-bottom: 56.25%"></div>
+            </a>
+          `;
+    })}
+      </div>
+    </div>
+  `;
+}
+
+function renderPageImages(pages) {
+    return pages.reduce(function (result, page, i) {
+        if (!page.files) 
+            return;
+        var images = objectValues(page.files).filter((file) => file.type === 'image');
+        result.push(randomImage(images, page));
+        result.push(randomImage(images, page));
+        result.push(randomImage(images, page));
+        return result;
+    }, []);
+}
+
+function randomImage(images, page) {
+    var image = images[Math.floor(Math.random() * images.length)];
+    return html`
+    <div class="c4 p0-5">
+      <a
+        href="${page.url}"
+        class="bgc-white db curp bgsc bgrn bgpc w100"
+        style="background-image: url(${image.path})"
+      ><div style="padding-bottom: 100%"></div></a>
+    </div>
+  `;
+}
+
+function shuffle(array) {
+    let counter = array.length;
+    while (counter > 0) {
+        let index = Math.floor(Math.random() * counter);
+        counter--;
+        let temp = array[counter];
+        array[counter] = array[index];
+        array[index] = temp;
+    }
+    return array;
+}
+
+
+}).call(this,require('_process'))
+},{"_process":108,"choo/html":6,"object-values":24}],35:[function(require,module,exports){
+(function (process){
+Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
+module.exports = {
+    default: require('./main'),
+    home: require('./home'),
+    performance: require('./performance')
+};
+
+
+}).call(this,require('_process'))
+},{"./home":34,"./main":36,"./performance":37,"_process":108}],36:[function(require,module,exports){
+(function (process){
+Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
+var ov = require('object-values');
+var html = require('choo/html');
+var video = require('../components/video');
+module.exports = view;
+function view(state, emit) {
+    var page = state.page;
     return html`
     <div>
-      <div>${page.title || page.name}</div>
+      <div class="p1 ttu">${page.title || page.name}</div>
       ${ov(page.pages).map(function (page) {
         page = state.content[page.url];
         return html`<a href="${page.url}">${page.name}</a>`;
+    })}
+      ${ov(page.files).map(function (file, i) {
+        return html`<div><img src="${file.path}" class="db"></div>`;
+    })}
+      <div>
+        ${page.text}
+      </div>
+      ${video(page.source, {
+        ratio: page.ratio
+    })}
+      <ol class="p1 ttu">
+        ${ov(page.files).map(function (file, i) {
+        return html`<li class="x">  
+            <div class="c2">${('0' + i).slice(-2)}</div>
+            <div class="c10">${file.filename}</div>
+          </li>`;
+    })}
+      </ol>
+    </div>
+  `;
+}
+
+
+}).call(this,require('_process'))
+},{"../components/video":1,"_process":108,"choo/html":6,"object-values":24}],37:[function(require,module,exports){
+(function (process){
+Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
+var ov = require('object-values');
+var html = require('choo/html');
+var video = require('../components/video');
+module.exports = view;
+function view(state, emit) {
+    var page = state.page;
+    return html`
+    <div class="w100 ttu">
+      <div class="x p0-5">
+        <div class="c6 p0-5">${page.artist}</div>
+        <div class="c6 p0-5">${page.venue}</div>
+      </div>
+      ${page.sources.map(function (source) {
+        return video(source);
+    })}
+      <div class="x c12 p0-5">
+        <div class="c3 p0-5">
+          Setlist
+        </div>
+        <ol class="c9 py0-5">
+          ${ov(page.setlist).map(function (song, i) {
+        return html`<li class="x c12">  
+              <div class="c4 px0-5">${('0' + i).slice(-2)}</div>
+              <div class="c8 px0-5">${song}</div>
+            </li>`;
+    })}
+        </ol>
+      </div>
+      ${ov(page.files).map(function (file) {
+        return html`<div><img src="${file.path}" class="db"></div>`;
     })}
       <div>
         ${page.text}
@@ -3481,7 +2112,7 @@ function view(state, emit) {
 
 
 }).call(this,require('_process'))
-},{"_process":5,"choo/html":12,"object-values":29}],39:[function(require,module,exports){
+},{"../components/video":1,"_process":108,"choo/html":6,"object-values":24}],38:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 var html = require('choo/html');
@@ -3498,34 +2129,32 @@ function view(state, emit) {
     if (!state.loaded && typeof page === 'undefined') 
         return loading();
     var view = views[page.view] || views.default;
-    return html`
-    <body>
-      ${view(xtend(state, {
+    return body(view(xtend(state, {
         page: page
-    }), emit)}
-    </body>
-  `;
+    }), emit));
 }
 
 function loading() {
-    return html`
-    <body>
-      loading
-    </body>
-  `;
+    return body(html`
+    <div class="x xjc xac">loading</div>
+  `);
 }
 
 function notfound() {
+    return body('not found');
+}
+
+function body(view) {
     return html`
-    <body>
-      not found
+    <body class="ff-sans bgc-black fc-white">
+      ${view}
     </body>
   `;
 }
 
 
 }).call(this,require('_process'))
-},{"./":37,"_process":5,"choo/html":12,"xtend":34}],40:[function(require,module,exports){
+},{"./":35,"_process":108,"choo/html":6,"xtend":30}],39:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 var xtend = require('xtend');
@@ -3599,7 +2228,7 @@ function readSiteSync(pathSite, opts, callback) {
 
 
 }).call(this,require('_process'))
-},{"./lib":42,"_process":5,"fs":1,"xtend":102}],41:[function(require,module,exports){
+},{"./lib":41,"_process":108,"fs":103,"xtend":101}],40:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 module.exports = {
@@ -3618,7 +2247,7 @@ module.exports = {
 
 
 }).call(this,require('_process'))
-},{"_process":5}],42:[function(require,module,exports){
+},{"_process":108}],41:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 module.exports = {
@@ -3632,13 +2261,12 @@ module.exports = {
 
 
 }).call(this,require('_process'))
-},{"./readFile":43,"./readFiles":45,"./readPage":47,"./readPageSync":48,"./readSite":49,"./readSiteSync":50,"_process":5}],43:[function(require,module,exports){
+},{"./readFile":42,"./readFiles":44,"./readPage":46,"./readPageSync":47,"./readSite":48,"./readSiteSync":49,"_process":108}],42:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 var assert = require('assert');
-var path = require('path');
-var readPage = require('./readPage');
 var utilFile = require('../utils/file');
+var readPage = require('./readPage');
 module.exports = readFile;
 function readFile(pathFile, opts) {
     return (function ($return, $error) {
@@ -3656,7 +2284,7 @@ function readFile(pathFile, opts) {
 
 
 }).call(this,require('_process'))
-},{"../utils/file":103,"./readPage":47,"_process":5,"assert":2,"path":4}],44:[function(require,module,exports){
+},{"../utils/file":102,"./readPage":46,"_process":108,"assert":104}],43:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 var assert = require('assert');
@@ -3677,7 +2305,7 @@ function readFileSync(pathFile, opts) {
 
 
 }).call(this,require('_process'))
-},{"../utils/file":103,"./readPageSync":48,"_process":5,"assert":2,"path":4}],45:[function(require,module,exports){
+},{"../utils/file":102,"./readPageSync":47,"_process":108,"assert":104,"path":107}],44:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 var assert = require('assert');
@@ -3713,7 +2341,7 @@ function readFiles(files, pathSite, opts) {
 
 
 }).call(this,require('_process'))
-},{"./readFile":43,"_process":5,"assert":2,"path":4}],46:[function(require,module,exports){
+},{"./readFile":42,"_process":108,"assert":104,"path":107}],45:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 var assert = require('assert');
@@ -3738,7 +2366,7 @@ function readFilesSync(files, pathSite, opts) {
 
 
 }).call(this,require('_process'))
-},{"./readFileSync":44,"_process":5,"assert":2}],47:[function(require,module,exports){
+},{"./readFileSync":43,"_process":108,"assert":104}],46:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 var assert = require('assert');
@@ -3869,7 +2497,7 @@ function readPage(pathPage, opts) {
 
 
 }).call(this,require('_process'))
-},{"../utils/file":103,"./defaults":41,"_process":5,"assert":2,"path":4,"smarkt":97,"xtend":102}],48:[function(require,module,exports){
+},{"../utils/file":102,"./defaults":40,"_process":108,"assert":104,"path":107,"smarkt":96,"xtend":101}],47:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 var assert = require('assert');
@@ -3963,14 +2591,14 @@ function readPageSync(pathPage, opts) {
 
 
 }).call(this,require('_process'))
-},{"../utils/file":103,"./defaults":41,"_process":5,"assert":2,"path":4,"smarkt":97,"xtend":102}],49:[function(require,module,exports){
+},{"../utils/file":102,"./defaults":40,"_process":108,"assert":104,"path":107,"smarkt":96,"xtend":101}],48:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 var assert = require('assert');
 var path = require('path');
 var glob = require('glob');
-var readFile = require('./readFile');
 var readFiles = require('./readFiles');
+var readFile = require('./readFile');
 module.exports = readSite;
 function readSite(pathSite, opts) {
     return (function ($return, $error) {
@@ -3987,7 +2615,7 @@ function readSite(pathSite, opts) {
 
 
 }).call(this,require('_process'))
-},{"./readFile":43,"./readFiles":45,"_process":5,"assert":2,"glob":57,"path":4}],50:[function(require,module,exports){
+},{"./readFile":42,"./readFiles":44,"_process":108,"assert":104,"glob":56,"path":107}],49:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 var assert = require('assert');
@@ -4005,7 +2633,7 @@ function readSiteSync(pathSite, opts) {
 
 
 }).call(this,require('_process'))
-},{"./readFilesSync":46,"_process":5,"assert":2,"glob":57,"path":4}],51:[function(require,module,exports){
+},{"./readFilesSync":45,"_process":108,"assert":104,"glob":56,"path":107}],50:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 'use strict';
@@ -4064,7 +2692,7 @@ function range(a, b, str) {
 
 
 }).call(this,require('_process'))
-},{"_process":5}],52:[function(require,module,exports){
+},{"_process":108}],51:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 var concatMap = require('concat-map');
@@ -4236,7 +2864,7 @@ function expand(str, isTop) {
 
 
 }).call(this,require('_process'))
-},{"_process":5,"balanced-match":51,"concat-map":53}],53:[function(require,module,exports){
+},{"_process":108,"balanced-match":50,"concat-map":52}],52:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 module.exports = function (xs, fn) {
@@ -4256,7 +2884,7 @@ var isArray = Array.isArray || function (xs) {
 
 
 }).call(this,require('_process'))
-},{"_process":5}],54:[function(require,module,exports){
+},{"_process":108}],53:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 module.exports = realpath;
@@ -4319,7 +2947,7 @@ function unmonkeypatch() {
 
 
 }).call(this,require('_process'))
-},{"./old.js":55,"_process":5,"fs":1}],55:[function(require,module,exports){
+},{"./old.js":54,"_process":108,"fs":103}],54:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 // Copyright Joyent, Inc. and other Node contributors.
@@ -4600,7 +3228,7 @@ exports.realpath = function realpath(p, cache, cb) {
 
 
 }).call(this,require('_process'))
-},{"_process":5,"fs":1,"path":4}],56:[function(require,module,exports){
+},{"_process":108,"fs":103,"path":107}],55:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 exports.alphasort = alphasort;
@@ -4822,7 +3450,7 @@ function childrenIgnored(self, path) {
 
 
 }).call(this,require('_process'))
-},{"_process":5,"minimatch":91,"path":4,"path-is-absolute":95}],57:[function(require,module,exports){
+},{"_process":108,"minimatch":90,"path":107,"path-is-absolute":94}],56:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 // Approach:
@@ -5488,7 +4116,7 @@ Glob.prototype._stat2 = function (f, abs, er, stat, cb) {
 
 
 }).call(this,require('_process'))
-},{"./common.js":56,"./sync.js":58,"_process":5,"assert":2,"events":3,"fs":1,"fs.realpath":54,"inflight":59,"inherits":60,"minimatch":91,"once":94,"path":4,"path-is-absolute":95,"util":8}],58:[function(require,module,exports){
+},{"./common.js":55,"./sync.js":57,"_process":108,"assert":104,"events":105,"fs":103,"fs.realpath":53,"inflight":58,"inherits":59,"minimatch":90,"once":93,"path":107,"path-is-absolute":94,"util":110}],57:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 module.exports = globSync;
@@ -5890,7 +4518,7 @@ GlobSync.prototype._makeAbs = function (f) {
 
 
 }).call(this,require('_process'))
-},{"./common.js":56,"./glob.js":57,"_process":5,"assert":2,"fs":1,"fs.realpath":54,"minimatch":91,"path":4,"path-is-absolute":95,"util":8}],59:[function(require,module,exports){
+},{"./common.js":55,"./glob.js":56,"_process":108,"assert":104,"fs":103,"fs.realpath":53,"minimatch":90,"path":107,"path-is-absolute":94,"util":110}],58:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 var wrappy = require('wrappy');
@@ -5947,9 +4575,36 @@ function slice(args) {
 
 
 }).call(this,require('_process'))
-},{"_process":5,"once":94,"wrappy":101}],60:[function(require,module,exports){
-arguments[4][6][0].apply(exports,arguments)
-},{"_process":5,"dup":6}],61:[function(require,module,exports){
+},{"_process":108,"once":93,"wrappy":100}],59:[function(require,module,exports){
+(function (process){
+Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
+if (typeof Object.create === 'function') {
+    // implementation from standard node.js 'util' module
+    module.exports = function inherits(ctor, superCtor) {
+        ctor.super_ = superCtor;
+        ctor.prototype = Object.create(superCtor.prototype, {
+            constructor: {
+                value: ctor,
+                enumerable: false,
+                writable: true,
+                configurable: true
+            }
+        });
+    };
+} else {
+    // old school shim for old browsers
+    module.exports = function inherits(ctor, superCtor) {
+        ctor.super_ = superCtor;
+        var TempCtor = function () {};
+        TempCtor.prototype = superCtor.prototype;
+        ctor.prototype = new TempCtor();
+        ctor.prototype.constructor = ctor;
+    };
+}
+
+
+}).call(this,require('_process'))
+},{"_process":108}],60:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 'use strict';
@@ -5958,7 +4613,7 @@ module.exports = yaml;
 
 
 }).call(this,require('_process'))
-},{"./lib/js-yaml.js":62,"_process":5}],62:[function(require,module,exports){
+},{"./lib/js-yaml.js":61,"_process":108}],61:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 'use strict';
@@ -5996,7 +4651,7 @@ module.exports.addConstructor = deprecated('addConstructor');
 
 
 }).call(this,require('_process'))
-},{"./js-yaml/dumper":64,"./js-yaml/exception":65,"./js-yaml/loader":66,"./js-yaml/schema":68,"./js-yaml/schema/core":69,"./js-yaml/schema/default_full":70,"./js-yaml/schema/default_safe":71,"./js-yaml/schema/failsafe":72,"./js-yaml/schema/json":73,"./js-yaml/type":74,"_process":5}],63:[function(require,module,exports){
+},{"./js-yaml/dumper":63,"./js-yaml/exception":64,"./js-yaml/loader":65,"./js-yaml/schema":67,"./js-yaml/schema/core":68,"./js-yaml/schema/default_full":69,"./js-yaml/schema/default_safe":70,"./js-yaml/schema/failsafe":71,"./js-yaml/schema/json":72,"./js-yaml/type":73,"_process":108}],62:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 'use strict';
@@ -6049,7 +4704,7 @@ module.exports.extend = extend;
 
 
 }).call(this,require('_process'))
-},{"_process":5}],64:[function(require,module,exports){
+},{"_process":108}],63:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 'use strict';
@@ -6698,7 +5353,7 @@ module.exports.safeDump = safeDump;
 
 
 }).call(this,require('_process'))
-},{"./common":63,"./exception":65,"./schema/default_full":70,"./schema/default_safe":71,"_process":5}],65:[function(require,module,exports){
+},{"./common":62,"./exception":64,"./schema/default_full":69,"./schema/default_safe":70,"_process":108}],64:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 // YAML error class. http://stackoverflow.com/questions/8458984
@@ -6736,7 +5391,7 @@ module.exports = YAMLException;
 
 
 }).call(this,require('_process'))
-},{"_process":5}],66:[function(require,module,exports){
+},{"_process":108}],65:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 'use strict';
@@ -7908,7 +6563,7 @@ module.exports.safeLoad = safeLoad;
 
 
 }).call(this,require('_process'))
-},{"./common":63,"./exception":65,"./mark":67,"./schema/default_full":70,"./schema/default_safe":71,"_process":5}],67:[function(require,module,exports){
+},{"./common":62,"./exception":64,"./mark":66,"./schema/default_full":69,"./schema/default_safe":70,"_process":108}],66:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 'use strict';
@@ -7968,7 +6623,7 @@ module.exports = Mark;
 
 
 }).call(this,require('_process'))
-},{"./common":63,"_process":5}],68:[function(require,module,exports){
+},{"./common":62,"_process":108}],67:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 'use strict';
@@ -8061,7 +6716,7 @@ module.exports = Schema;
 
 
 }).call(this,require('_process'))
-},{"./common":63,"./exception":65,"./type":74,"_process":5}],69:[function(require,module,exports){
+},{"./common":62,"./exception":64,"./type":73,"_process":108}],68:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 // Standard YAML's Core schema.
@@ -8077,7 +6732,7 @@ module.exports = new Schema({
 
 
 }).call(this,require('_process'))
-},{"../schema":68,"./json":73,"_process":5}],70:[function(require,module,exports){
+},{"../schema":67,"./json":72,"_process":108}],69:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 // JS-YAML's default schema for `load` function.
@@ -8096,7 +6751,7 @@ module.exports = (Schema.DEFAULT = new Schema({
 
 
 }).call(this,require('_process'))
-},{"../schema":68,"../type/js/function":79,"../type/js/regexp":80,"../type/js/undefined":81,"./default_safe":71,"_process":5}],71:[function(require,module,exports){
+},{"../schema":67,"../type/js/function":78,"../type/js/regexp":79,"../type/js/undefined":80,"./default_safe":70,"_process":108}],70:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 // JS-YAML's default schema for `safeLoad` function.
@@ -8115,7 +6770,7 @@ module.exports = new Schema({
 
 
 }).call(this,require('_process'))
-},{"../schema":68,"../type/binary":75,"../type/merge":83,"../type/omap":85,"../type/pairs":86,"../type/set":88,"../type/timestamp":90,"./core":69,"_process":5}],72:[function(require,module,exports){
+},{"../schema":67,"../type/binary":74,"../type/merge":82,"../type/omap":84,"../type/pairs":85,"../type/set":87,"../type/timestamp":89,"./core":68,"_process":108}],71:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 // Standard YAML's Failsafe schema.
@@ -8128,7 +6783,7 @@ module.exports = new Schema({
 
 
 }).call(this,require('_process'))
-},{"../schema":68,"../type/map":82,"../type/seq":87,"../type/str":89,"_process":5}],73:[function(require,module,exports){
+},{"../schema":67,"../type/map":81,"../type/seq":86,"../type/str":88,"_process":108}],72:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 // Standard YAML's JSON schema.
@@ -8147,7 +6802,7 @@ module.exports = new Schema({
 
 
 }).call(this,require('_process'))
-},{"../schema":68,"../type/bool":76,"../type/float":77,"../type/int":78,"../type/null":84,"./failsafe":72,"_process":5}],74:[function(require,module,exports){
+},{"../schema":67,"../type/bool":75,"../type/float":76,"../type/int":77,"../type/null":83,"./failsafe":71,"_process":108}],73:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 'use strict';
@@ -8197,7 +6852,7 @@ module.exports = Type;
 
 
 }).call(this,require('_process'))
-},{"./exception":65,"_process":5}],75:[function(require,module,exports){
+},{"./exception":64,"_process":108}],74:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 'use strict';
@@ -8308,7 +6963,7 @@ module.exports = new Type('tag:yaml.org,2002:binary', {
 
 
 }).call(this,require('_process'))
-},{"../type":74,"_process":5}],76:[function(require,module,exports){
+},{"../type":73,"_process":108}],75:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 'use strict';
@@ -8349,7 +7004,7 @@ module.exports = new Type('tag:yaml.org,2002:bool', {
 
 
 }).call(this,require('_process'))
-},{"../type":74,"_process":5}],77:[function(require,module,exports){
+},{"../type":73,"_process":108}],76:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 'use strict';
@@ -8454,7 +7109,7 @@ module.exports = new Type('tag:yaml.org,2002:float', {
 
 
 }).call(this,require('_process'))
-},{"../common":63,"../type":74,"_process":5}],78:[function(require,module,exports){
+},{"../common":62,"../type":73,"_process":108}],77:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 'use strict';
@@ -8621,7 +7276,7 @@ module.exports = new Type('tag:yaml.org,2002:int', {
 
 
 }).call(this,require('_process'))
-},{"../common":63,"../type":74,"_process":5}],79:[function(require,module,exports){
+},{"../common":62,"../type":73,"_process":108}],78:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 'use strict';
@@ -8695,7 +7350,7 @@ module.exports = new Type('tag:yaml.org,2002:js/function', {
 
 
 }).call(this,require('_process'))
-},{"../../type":74,"_process":5}],80:[function(require,module,exports){
+},{"../../type":73,"_process":108}],79:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 'use strict';
@@ -8756,7 +7411,7 @@ module.exports = new Type('tag:yaml.org,2002:js/regexp', {
 
 
 }).call(this,require('_process'))
-},{"../../type":74,"_process":5}],81:[function(require,module,exports){
+},{"../../type":73,"_process":108}],80:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 'use strict';
@@ -8788,7 +7443,7 @@ module.exports = new Type('tag:yaml.org,2002:js/undefined', {
 
 
 }).call(this,require('_process'))
-},{"../../type":74,"_process":5}],82:[function(require,module,exports){
+},{"../../type":73,"_process":108}],81:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 'use strict';
@@ -8802,7 +7457,7 @@ module.exports = new Type('tag:yaml.org,2002:map', {
 
 
 }).call(this,require('_process'))
-},{"../type":74,"_process":5}],83:[function(require,module,exports){
+},{"../type":73,"_process":108}],82:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 'use strict';
@@ -8818,7 +7473,7 @@ module.exports = new Type('tag:yaml.org,2002:merge', {
 
 
 }).call(this,require('_process'))
-},{"../type":74,"_process":5}],84:[function(require,module,exports){
+},{"../type":73,"_process":108}],83:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 'use strict';
@@ -8862,7 +7517,7 @@ module.exports = new Type('tag:yaml.org,2002:null', {
 
 
 }).call(this,require('_process'))
-},{"../type":74,"_process":5}],85:[function(require,module,exports){
+},{"../type":73,"_process":108}],84:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 'use strict';
@@ -8908,7 +7563,7 @@ module.exports = new Type('tag:yaml.org,2002:omap', {
 
 
 }).call(this,require('_process'))
-},{"../type":74,"_process":5}],86:[function(require,module,exports){
+},{"../type":73,"_process":108}],85:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 'use strict';
@@ -8952,7 +7607,7 @@ module.exports = new Type('tag:yaml.org,2002:pairs', {
 
 
 }).call(this,require('_process'))
-},{"../type":74,"_process":5}],87:[function(require,module,exports){
+},{"../type":73,"_process":108}],86:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 'use strict';
@@ -8966,7 +7621,7 @@ module.exports = new Type('tag:yaml.org,2002:seq', {
 
 
 }).call(this,require('_process'))
-},{"../type":74,"_process":5}],88:[function(require,module,exports){
+},{"../type":73,"_process":108}],87:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 'use strict';
@@ -8997,7 +7652,7 @@ module.exports = new Type('tag:yaml.org,2002:set', {
 
 
 }).call(this,require('_process'))
-},{"../type":74,"_process":5}],89:[function(require,module,exports){
+},{"../type":73,"_process":108}],88:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 'use strict';
@@ -9011,7 +7666,7 @@ module.exports = new Type('tag:yaml.org,2002:str', {
 
 
 }).call(this,require('_process'))
-},{"../type":74,"_process":5}],90:[function(require,module,exports){
+},{"../type":73,"_process":108}],89:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 'use strict';
@@ -9081,7 +7736,7 @@ module.exports = new Type('tag:yaml.org,2002:timestamp', {
 
 
 }).call(this,require('_process'))
-},{"../type":74,"_process":5}],91:[function(require,module,exports){
+},{"../type":73,"_process":108}],90:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 module.exports = minimatch;
@@ -9906,7 +8561,7 @@ function regExpEscape(s) {
 
 
 }).call(this,require('_process'))
-},{"_process":5,"brace-expansion":52,"path":4}],92:[function(require,module,exports){
+},{"_process":108,"brace-expansion":51,"path":107}],91:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 'use strict';
@@ -10040,7 +8695,7 @@ module.exports = keysShim;
 
 
 }).call(this,require('_process'))
-},{"./isArguments":93,"_process":5}],93:[function(require,module,exports){
+},{"./isArguments":92,"_process":108}],92:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 'use strict';
@@ -10056,7 +8711,7 @@ module.exports = function isArguments(value) {
 
 
 }).call(this,require('_process'))
-},{"_process":5}],94:[function(require,module,exports){
+},{"_process":108}],93:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 var wrappy = require('wrappy');
@@ -10102,7 +8757,7 @@ function onceStrict(fn) {
 
 
 }).call(this,require('_process'))
-},{"_process":5,"wrappy":101}],95:[function(require,module,exports){
+},{"_process":108,"wrappy":100}],94:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 'use strict';
@@ -10126,7 +8781,7 @@ module.exports.win32 = win32;
 
 
 }).call(this,require('_process'))
-},{"_process":5}],96:[function(require,module,exports){
+},{"_process":108}],95:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 'use strict';
@@ -10141,7 +8796,7 @@ module.exports = function (str) {
 
 
 }).call(this,require('_process'))
-},{"_process":5}],97:[function(require,module,exports){
+},{"_process":108}],96:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 module.exports = {
@@ -10151,7 +8806,7 @@ module.exports = {
 
 
 }).call(this,require('_process'))
-},{"./lib/parse":98,"./lib/stringify":99,"_process":5}],98:[function(require,module,exports){
+},{"./lib/parse":97,"./lib/stringify":98,"_process":108}],97:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 var assert = require('assert');
@@ -10176,7 +8831,7 @@ function parse(str) {
 
 
 }).call(this,require('_process'))
-},{"./utils":100,"_process":5,"assert":2,"js-yaml":61,"xtend":102}],99:[function(require,module,exports){
+},{"./utils":99,"_process":108,"assert":104,"js-yaml":60,"xtend":101}],98:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 var objectKeys = require('object-keys');
@@ -10200,7 +8855,7 @@ function stringify(obj) {
 
 
 }).call(this,require('_process'))
-},{"_process":5,"assert":2,"js-yaml":61,"object-keys":92}],100:[function(require,module,exports){
+},{"_process":108,"assert":104,"js-yaml":60,"object-keys":91}],99:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 var objectKeys = require('object-keys');
@@ -10235,7 +8890,7 @@ function setBool(str) {
 
 
 }).call(this,require('_process'))
-},{"_process":5,"object-keys":92}],101:[function(require,module,exports){
+},{"_process":108,"object-keys":91}],100:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 // Returns a wrapper function that returns a wrapped callback
@@ -10272,9 +8927,9 @@ function wrappy(fn, cb) {
 
 
 }).call(this,require('_process'))
-},{"_process":5}],102:[function(require,module,exports){
-arguments[4][34][0].apply(exports,arguments)
-},{"_process":5,"dup":34}],103:[function(require,module,exports){
+},{"_process":108}],101:[function(require,module,exports){
+arguments[4][30][0].apply(exports,arguments)
+},{"_process":108,"dup":30}],102:[function(require,module,exports){
 (function (process){
 Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
 var objectKeys = require('object-keys');
@@ -10360,4 +9015,1402 @@ function formatUrl(pathFile, pathRoot, pathSiteParent) {
 
 
 }).call(this,require('_process'))
-},{"_process":5,"assert":2,"object-keys":92,"path":4,"slash":96}]},{},[9]);
+},{"_process":108,"assert":104,"object-keys":91,"path":107,"slash":95}],103:[function(require,module,exports){
+(function (process){
+Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
+
+
+}).call(this,require('_process'))
+},{"_process":108}],104:[function(require,module,exports){
+(function (process){
+Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
+// http://wiki.commonjs.org/wiki/Unit_Testing/1.0
+//
+// THIS IS NOT TESTED NOR LIKELY TO WORK OUTSIDE V8!
+//
+// Originally from narwhal.js (http://narwhaljs.org)
+// Copyright (c) 2009 Thomas Robinson <280north.com>
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the 'Software'), to
+// deal in the Software without restriction, including without limitation the
+// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+// sell copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+// ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// when used in node, this will actually load the util module we depend on
+// versus loading the builtin util module as happens otherwise
+// this is a bug in node module loading as far as I am concerned
+var util = require('util/');
+var pSlice = Array.prototype.slice;
+var hasOwn = Object.prototype.hasOwnProperty;
+// 1. The assert module provides functions that throw
+// AssertionError's when particular conditions are not met. The
+// assert module must conform to the following interface.
+var assert = module.exports = ok;
+// 2. The AssertionError is defined in assert.
+// new assert.AssertionError({ message: message,
+//                             actual: actual,
+//                             expected: expected })
+assert.AssertionError = function AssertionError(options) {
+    this.name = 'AssertionError';
+    this.actual = options.actual;
+    this.expected = options.expected;
+    this.operator = options.operator;
+    if (options.message) {
+        this.message = options.message;
+        this.generatedMessage = false;
+    } else {
+        this.message = getMessage(this);
+        this.generatedMessage = true;
+    }
+    var stackStartFunction = options.stackStartFunction || fail;
+    if (Error.captureStackTrace) {
+        Error.captureStackTrace(this, stackStartFunction);
+    } else {
+        // non v8 browsers so we can have a stacktrace
+        var err = new Error();
+        if (err.stack) {
+            var out = err.stack;
+            // try to strip useless frames
+            var fn_name = stackStartFunction.name;
+            var idx = out.indexOf('\n' + fn_name);
+            if (idx >= 0) {
+                // once we have located the function frame
+                // we need to strip out everything before it (and its line)
+                var next_line = out.indexOf('\n', idx + 1);
+                out = out.substring(next_line + 1);
+            }
+            this.stack = out;
+        }
+    }
+};
+// assert.AssertionError instanceof Error
+util.inherits(assert.AssertionError, Error);
+function replacer(key, value) {
+    if (util.isUndefined(value)) {
+        return '' + value;
+    }
+    if (util.isNumber(value) && !isFinite(value)) {
+        return value.toString();
+    }
+    if (util.isFunction(value) || util.isRegExp(value)) {
+        return value.toString();
+    }
+    return value;
+}
+
+function truncate(s, n) {
+    if (util.isString(s)) {
+        return s.length < n ? s : s.slice(0, n);
+    } else {
+        return s;
+    }
+}
+
+function getMessage(self) {
+    return truncate(JSON.stringify(self.actual, replacer), 128) + ' ' + self.operator + ' ' + truncate(JSON.stringify(self.expected, replacer), 128);
+}
+
+// At present only the three keys mentioned above are used and
+// understood by the spec. Implementations or sub modules can pass
+// other keys to the AssertionError's constructor - they will be
+// ignored.
+// 3. All of the following functions must throw an AssertionError
+// when a corresponding condition is not met, with a message that
+// may be undefined if not provided.  All assertion methods provide
+// both the actual and expected values to the assertion error for
+// display purposes.
+function fail(actual, expected, message, operator, stackStartFunction) {
+    throw new assert.AssertionError({
+        message: message,
+        actual: actual,
+        expected: expected,
+        operator: operator,
+        stackStartFunction: stackStartFunction
+    });
+}
+
+// EXTENSION! allows for well behaved errors defined elsewhere.
+assert.fail = fail;
+// 4. Pure assertion tests whether a value is truthy, as determined
+// by !!guard.
+// assert.ok(guard, message_opt);
+// This statement is equivalent to assert.equal(true, !!guard,
+// message_opt);. To test strictly for the value true, use
+// assert.strictEqual(true, guard, message_opt);.
+function ok(value, message) {
+    if (!value) 
+        fail(value, true, message, '==', assert.ok);
+}
+
+assert.ok = ok;
+// 5. The equality assertion tests shallow, coercive equality with
+// ==.
+// assert.equal(actual, expected, message_opt);
+assert.equal = function equal(actual, expected, message) {
+    if (actual != expected) 
+        fail(actual, expected, message, '==', assert.equal);
+};
+// 6. The non-equality assertion tests for whether two objects are not equal
+// with != assert.notEqual(actual, expected, message_opt);
+assert.notEqual = function notEqual(actual, expected, message) {
+    if (actual == expected) {
+        fail(actual, expected, message, '!=', assert.notEqual);
+    }
+};
+// 7. The equivalence assertion tests a deep equality relation.
+// assert.deepEqual(actual, expected, message_opt);
+assert.deepEqual = function deepEqual(actual, expected, message) {
+    if (!_deepEqual(actual, expected)) {
+        fail(actual, expected, message, 'deepEqual', assert.deepEqual);
+    }
+};
+function _deepEqual(actual, expected) {
+    // 7.1. All identical values are equivalent, as determined by ===.
+    if (actual === expected) {
+        return true;
+    } else if (util.isBuffer(actual) && util.isBuffer(expected)) {
+        if (actual.length != expected.length) 
+            return false;
+        for (var i = 0;i < actual.length; i++) {
+            if (actual[i] !== expected[i]) 
+                return false;
+        }
+        return true;
+    // 7.2. If the expected value is a Date object, the actual value is
+    // equivalent if it is also a Date object that refers to the same time.
+    } else if (util.isDate(actual) && util.isDate(expected)) {
+        return actual.getTime() === expected.getTime();
+    // 7.3 If the expected value is a RegExp object, the actual value is
+    // equivalent if it is also a RegExp object with the same source and
+    // properties (`global`, `multiline`, `lastIndex`, `ignoreCase`).
+    } else if (util.isRegExp(actual) && util.isRegExp(expected)) {
+        return actual.source === expected.source && actual.global === expected.global && actual.multiline === expected.multiline && actual.lastIndex === expected.lastIndex && actual.ignoreCase === expected.ignoreCase;
+    // 7.4. Other pairs that do not both pass typeof value == 'object',
+    // equivalence is determined by ==.
+    } else if (!util.isObject(actual) && !util.isObject(expected)) {
+        return actual == expected;
+    } else {
+        // 7.5 For all other Object pairs, including Array objects, equivalence is
+        // determined by having the same number of owned properties (as verified
+        // with Object.prototype.hasOwnProperty.call), the same set of keys
+        // (although not necessarily the same order), equivalent values for every
+        // corresponding key, and an identical 'prototype' property. Note: this
+        // accounts for both named and indexed properties on Arrays.
+        return objEquiv(actual, expected);
+    }
+}
+
+function isArguments(object) {
+    return Object.prototype.toString.call(object) == '[object Arguments]';
+}
+
+function objEquiv(a, b) {
+    if (util.isNullOrUndefined(a) || util.isNullOrUndefined(b)) 
+        return false;
+    // an identical 'prototype' property.
+    if (a.prototype !== b.prototype) 
+        return false;
+    // if one is a primitive, the other must be same
+    if (util.isPrimitive(a) || util.isPrimitive(b)) {
+        return a === b;
+    }
+    var aIsArgs = isArguments(a), bIsArgs = isArguments(b);
+    if (aIsArgs && !bIsArgs || !aIsArgs && bIsArgs) 
+        return false;
+    if (aIsArgs) {
+        a = pSlice.call(a);
+        b = pSlice.call(b);
+        return _deepEqual(a, b);
+    }
+    var ka = objectKeys(a), kb = objectKeys(b), key, i;
+    // having the same number of owned properties (keys incorporates
+    // hasOwnProperty)
+    if (ka.length != kb.length) 
+        return false;
+    //the same set of keys (although not necessarily the same order),
+    ka.sort();
+    kb.sort();
+    //~~~cheap key test
+    for (i = ka.length - 1; i >= 0; i--) {
+        if (ka[i] != kb[i]) 
+            return false;
+    }
+    //equivalent values for every corresponding key, and
+    //~~~possibly expensive deep test
+    for (i = ka.length - 1; i >= 0; i--) {
+        key = ka[i];
+        if (!_deepEqual(a[key], b[key])) 
+            return false;
+    }
+    return true;
+}
+
+// 8. The non-equivalence assertion tests for any deep inequality.
+// assert.notDeepEqual(actual, expected, message_opt);
+assert.notDeepEqual = function notDeepEqual(actual, expected, message) {
+    if (_deepEqual(actual, expected)) {
+        fail(actual, expected, message, 'notDeepEqual', assert.notDeepEqual);
+    }
+};
+// 9. The strict equality assertion tests strict equality, as determined by ===.
+// assert.strictEqual(actual, expected, message_opt);
+assert.strictEqual = function strictEqual(actual, expected, message) {
+    if (actual !== expected) {
+        fail(actual, expected, message, '===', assert.strictEqual);
+    }
+};
+// 10. The strict non-equality assertion tests for strict inequality, as
+// determined by !==.  assert.notStrictEqual(actual, expected, message_opt);
+assert.notStrictEqual = function notStrictEqual(actual, expected, message) {
+    if (actual === expected) {
+        fail(actual, expected, message, '!==', assert.notStrictEqual);
+    }
+};
+function expectedException(actual, expected) {
+    if (!actual || !expected) {
+        return false;
+    }
+    if (Object.prototype.toString.call(expected) == '[object RegExp]') {
+        return expected.test(actual);
+    } else if (actual instanceof expected) {
+        return true;
+    } else if (expected.call({}, actual) === true) {
+        return true;
+    }
+    return false;
+}
+
+function _throws(shouldThrow, block, expected, message) {
+    var actual;
+    if (util.isString(expected)) {
+        message = expected;
+        expected = null;
+    }
+    try {
+        block();
+    } catch (e) {
+        actual = e;
+    }
+    message = (expected && expected.name ? ' (' + expected.name + ').' : '.') + (message ? ' ' + message : '.');
+    if (shouldThrow && !actual) {
+        fail(actual, expected, 'Missing expected exception' + message);
+    }
+    if (!shouldThrow && expectedException(actual, expected)) {
+        fail(actual, expected, 'Got unwanted exception' + message);
+    }
+    if (shouldThrow && actual && expected && !expectedException(actual, expected) || !shouldThrow && actual) {
+        throw actual;
+    }
+}
+
+// 11. Expected to throw an error:
+// assert.throws(block, Error_opt, message_opt);
+assert.throws = function (block, error, message) { /*optional*/ /*optional*/
+    _throws.apply(this, [true].concat(pSlice.call(arguments)));
+};
+// EXTENSION! This is annoying to write outside this module.
+assert.doesNotThrow = function (block, message) { /*optional*/
+    _throws.apply(this, [false].concat(pSlice.call(arguments)));
+};
+assert.ifError = function (err) {
+    if (err) {
+        throw err;
+    }
+};
+var objectKeys = Object.keys || function (obj) {
+    var keys = [];
+    for (var key in obj) {
+        if (hasOwn.call(obj, key)) 
+            keys.push(key);
+    }
+    return keys;
+};
+
+
+}).call(this,require('_process'))
+},{"_process":108,"util/":110}],105:[function(require,module,exports){
+(function (process){
+Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+function EventEmitter() {
+    this._events = this._events || {};
+    this._maxListeners = this._maxListeners || undefined;
+}
+
+module.exports = EventEmitter;
+// Backwards-compat with node 0.10.x
+EventEmitter.EventEmitter = EventEmitter;
+EventEmitter.prototype._events = undefined;
+EventEmitter.prototype._maxListeners = undefined;
+// By default EventEmitters will print a warning if more than 10 listeners are
+// added to it. This is a useful default which helps finding memory leaks.
+EventEmitter.defaultMaxListeners = 10;
+// Obviously not all Emitters should be limited to 10. This function allows
+// that to be increased. Set to zero for unlimited.
+EventEmitter.prototype.setMaxListeners = function (n) {
+    if (!isNumber(n) || n < 0 || isNaN(n)) 
+        throw TypeError('n must be a positive number');
+    this._maxListeners = n;
+    return this;
+};
+EventEmitter.prototype.emit = function (type) {
+    var er, handler, len, args, i, listeners;
+    if (!this._events) 
+        this._events = {};
+    // If there is no 'error' event listener then throw.
+    if (type === 'error') {
+        if (!this._events.error || isObject(this._events.error) && !this._events.error.length) {
+            er = arguments[1];
+            if (er instanceof Error) {
+                throw er; //  Unhandled 'error' event
+            }
+            throw TypeError('Uncaught, unspecified "error" event.');
+        }
+    }
+    handler = this._events[type];
+    if (isUndefined(handler)) 
+        return false;
+    if (isFunction(handler)) {
+        switch (arguments.length) {
+                // fast cases
+            case 1:
+                handler.call(this);
+                break;
+            case 2:
+                handler.call(this, arguments[1]);
+                break;
+            case 3:
+                handler.call(this, arguments[1], arguments[2]);
+                break;
+            default:
+                // slower
+                args = Array.prototype.slice.call(arguments, 1);
+                handler.apply(this, args);
+        }
+    } else if (isObject(handler)) {
+        args = Array.prototype.slice.call(arguments, 1);
+        listeners = handler.slice();
+        len = listeners.length;
+        for (i = 0; i < len; i++) 
+            listeners[i].apply(this, args);
+    }
+    return true;
+};
+EventEmitter.prototype.addListener = function (type, listener) {
+    var m;
+    if (!isFunction(listener)) 
+        throw TypeError('listener must be a function');
+    if (!this._events) 
+        this._events = {};
+    // To avoid recursion in the case that type === "newListener"! Before
+    // adding it to the listeners, first emit "newListener".
+    if (this._events.newListener) 
+        this.emit('newListener', type, isFunction(listener.listener) ? listener.listener : listener);
+    if (!this._events[type]) 
+    // Optimize the case of one listener. Don't need the extra array object.
+        this._events[type] = listener;
+     else if (isObject(this._events[type])) 
+    // If we've already got an array, just append.
+        this._events[type].push(listener);
+     else 
+    // Adding the second element, need to change to array.
+        this._events[type] = [this._events[type],listener];
+    // Check for listener leak
+    if (isObject(this._events[type]) && !this._events[type].warned) {
+        if (!isUndefined(this._maxListeners)) {
+            m = this._maxListeners;
+        } else {
+            m = EventEmitter.defaultMaxListeners;
+        }
+        if (m && m > 0 && this._events[type].length > m) {
+            this._events[type].warned = true;
+            console.error('(node) warning: possible EventEmitter memory ' + 'leak detected. %d listeners added. ' + 'Use emitter.setMaxListeners() to increase limit.', this._events[type].length);
+            if (typeof console.trace === 'function') {
+                // not supported in IE 10
+                console.trace();
+            }
+        }
+    }
+    return this;
+};
+EventEmitter.prototype.on = EventEmitter.prototype.addListener;
+EventEmitter.prototype.once = function (type, listener) {
+    if (!isFunction(listener)) 
+        throw TypeError('listener must be a function');
+    var fired = false;
+    function g() {
+        this.removeListener(type, g);
+        if (!fired) {
+            fired = true;
+            listener.apply(this, arguments);
+        }
+    }
+    
+    g.listener = listener;
+    this.on(type, g);
+    return this;
+};
+// emits a 'removeListener' event iff the listener was removed
+EventEmitter.prototype.removeListener = function (type, listener) {
+    var list, position, length, i;
+    if (!isFunction(listener)) 
+        throw TypeError('listener must be a function');
+    if (!this._events || !this._events[type]) 
+        return this;
+    list = this._events[type];
+    length = list.length;
+    position = -1;
+    if (list === listener || isFunction(list.listener) && list.listener === listener) {
+        delete this._events[type];
+        if (this._events.removeListener) 
+            this.emit('removeListener', type, listener);
+    } else if (isObject(list)) {
+        for (i = length; i-- > 0; ) {
+            if (list[i] === listener || list[i].listener && list[i].listener === listener) {
+                position = i;
+                break;
+            }
+        }
+        if (position < 0) 
+            return this;
+        if (list.length === 1) {
+            list.length = 0;
+            delete this._events[type];
+        } else {
+            list.splice(position, 1);
+        }
+        if (this._events.removeListener) 
+            this.emit('removeListener', type, listener);
+    }
+    return this;
+};
+EventEmitter.prototype.removeAllListeners = function (type) {
+    var key, listeners;
+    if (!this._events) 
+        return this;
+    // not listening for removeListener, no need to emit
+    if (!this._events.removeListener) {
+        if (arguments.length === 0) 
+            this._events = {};
+         else if (this._events[type]) 
+            delete this._events[type];
+        return this;
+    }
+    // emit removeListener for all listeners on all events
+    if (arguments.length === 0) {
+        for (key in this._events) {
+            if (key === 'removeListener') 
+                continue;
+            this.removeAllListeners(key);
+        }
+        this.removeAllListeners('removeListener');
+        this._events = {};
+        return this;
+    }
+    listeners = this._events[type];
+    if (isFunction(listeners)) {
+        this.removeListener(type, listeners);
+    } else if (listeners) {
+        // LIFO order
+        while (listeners.length) 
+            this.removeListener(type, listeners[listeners.length - 1]);
+    }
+    delete this._events[type];
+    return this;
+};
+EventEmitter.prototype.listeners = function (type) {
+    var ret;
+    if (!this._events || !this._events[type]) 
+        ret = [];
+     else if (isFunction(this._events[type])) 
+        ret = [this._events[type]];
+     else 
+        ret = this._events[type].slice();
+    return ret;
+};
+EventEmitter.prototype.listenerCount = function (type) {
+    if (this._events) {
+        var evlistener = this._events[type];
+        if (isFunction(evlistener)) 
+            return 1;
+         else if (evlistener) 
+            return evlistener.length;
+    }
+    return 0;
+};
+EventEmitter.listenerCount = function (emitter, type) {
+    return emitter.listenerCount(type);
+};
+function isFunction(arg) {
+    return typeof arg === 'function';
+}
+
+function isNumber(arg) {
+    return typeof arg === 'number';
+}
+
+function isObject(arg) {
+    return typeof arg === 'object' && arg !== null;
+}
+
+function isUndefined(arg) {
+    return arg === void 0;
+}
+
+
+}).call(this,require('_process'))
+},{"_process":108}],106:[function(require,module,exports){
+arguments[4][59][0].apply(exports,arguments)
+},{"_process":108,"dup":59}],107:[function(require,module,exports){
+(function (process){
+Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+// resolves . and .. elements in a path array with directory names there
+// must be no slashes, empty elements, or device names (c:\) in the array
+// (so also no leading and trailing slashes - it does not distinguish
+// relative and absolute paths)
+function normalizeArray(parts, allowAboveRoot) {
+    // if the path tries to go above the root, `up` ends up > 0
+    var up = 0;
+    for (var i = parts.length - 1;i >= 0; i--) {
+        var last = parts[i];
+        if (last === '.') {
+            parts.splice(i, 1);
+        } else if (last === '..') {
+            parts.splice(i, 1);
+            up++;
+        } else if (up) {
+            parts.splice(i, 1);
+            up--;
+        }
+    }
+    // if the path is allowed to go above the root, restore leading ..s
+    if (allowAboveRoot) {
+        for (; up--; up) {
+            parts.unshift('..');
+        }
+    }
+    return parts;
+}
+
+// Split a filename into [root, dir, basename, ext], unix version
+// 'root' is just a slash, or nothing.
+var splitPathRe = /^(\/?|)([\s\S]*?)((?:\.{1,2}|[^\/]+?|)(\.[^.\/]*|))(?:[\/]*)$/;
+var splitPath = function (filename) {
+    return splitPathRe.exec(filename).slice(1);
+};
+// path.resolve([from ...], to)
+// posix version
+exports.resolve = function () {
+    var resolvedPath = '', resolvedAbsolute = false;
+    for (var i = arguments.length - 1;i >= -1 && !resolvedAbsolute; i--) {
+        var path = i >= 0 ? arguments[i] : process.cwd();
+        // Skip empty and invalid entries
+        if (typeof path !== 'string') {
+            throw new TypeError('Arguments to path.resolve must be strings');
+        } else if (!path) {
+            continue;
+        }
+        resolvedPath = path + '/' + resolvedPath;
+        resolvedAbsolute = path.charAt(0) === '/';
+    }
+    // At this point the path should be resolved to a full absolute path, but
+    // handle relative paths to be safe (might happen when process.cwd() fails)
+    // Normalize the path
+    resolvedPath = normalizeArray(filter(resolvedPath.split('/'), function (p) {
+        return !(!p);
+    }), !resolvedAbsolute).join('/');
+    return (resolvedAbsolute ? '/' : '') + resolvedPath || '.';
+};
+// path.normalize(path)
+// posix version
+exports.normalize = function (path) {
+    var isAbsolute = exports.isAbsolute(path), trailingSlash = substr(path, -1) === '/';
+    // Normalize the path
+    path = normalizeArray(filter(path.split('/'), function (p) {
+        return !(!p);
+    }), !isAbsolute).join('/');
+    if (!path && !isAbsolute) {
+        path = '.';
+    }
+    if (path && trailingSlash) {
+        path += '/';
+    }
+    return (isAbsolute ? '/' : '') + path;
+};
+// posix version
+exports.isAbsolute = function (path) {
+    return path.charAt(0) === '/';
+};
+// posix version
+exports.join = function () {
+    var paths = Array.prototype.slice.call(arguments, 0);
+    return exports.normalize(filter(paths, function (p, index) {
+        if (typeof p !== 'string') {
+            throw new TypeError('Arguments to path.join must be strings');
+        }
+        return p;
+    }).join('/'));
+};
+// path.relative(from, to)
+// posix version
+exports.relative = function (from, to) {
+    from = exports.resolve(from).substr(1);
+    to = exports.resolve(to).substr(1);
+    function trim(arr) {
+        var start = 0;
+        for (; start < arr.length; start++) {
+            if (arr[start] !== '') 
+                break;
+        }
+        var end = arr.length - 1;
+        for (; end >= 0; end--) {
+            if (arr[end] !== '') 
+                break;
+        }
+        if (start > end) 
+            return [];
+        return arr.slice(start, end - start + 1);
+    }
+    
+    var fromParts = trim(from.split('/'));
+    var toParts = trim(to.split('/'));
+    var length = Math.min(fromParts.length, toParts.length);
+    var samePartsLength = length;
+    for (var i = 0;i < length; i++) {
+        if (fromParts[i] !== toParts[i]) {
+            samePartsLength = i;
+            break;
+        }
+    }
+    var outputParts = [];
+    for (var i = samePartsLength;i < fromParts.length; i++) {
+        outputParts.push('..');
+    }
+    outputParts = outputParts.concat(toParts.slice(samePartsLength));
+    return outputParts.join('/');
+};
+exports.sep = '/';
+exports.delimiter = ':';
+exports.dirname = function (path) {
+    var result = splitPath(path), root = result[0], dir = result[1];
+    if (!root && !dir) {
+        // No dirname whatsoever
+        return '.';
+    }
+    if (dir) {
+        // It has a dirname, strip trailing slash
+        dir = dir.substr(0, dir.length - 1);
+    }
+    return root + dir;
+};
+exports.basename = function (path, ext) {
+    var f = splitPath(path)[2];
+    // TODO: make this comparison case-insensitive on windows?
+    if (ext && f.substr(-1 * ext.length) === ext) {
+        f = f.substr(0, f.length - ext.length);
+    }
+    return f;
+};
+exports.extname = function (path) {
+    return splitPath(path)[3];
+};
+function filter(xs, f) {
+    if (xs.filter) 
+        return xs.filter(f);
+    var res = [];
+    for (var i = 0;i < xs.length; i++) {
+        if (f(xs[i], i, xs)) 
+            res.push(xs[i]);
+    }
+    return res;
+}
+
+// String.prototype.substr - negative index don't work in IE8
+var substr = 'ab'.substr(-1) === 'b' ? function (str, start, len) {
+    return str.substr(start, len);
+} : function (str, start, len) {
+    if (start < 0) 
+        start = str.length + start;
+    return str.substr(start, len);
+};
+
+
+}).call(this,require('_process'))
+},{"_process":108}],108:[function(require,module,exports){
+Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
+// shim for using process in browser
+var process = module.exports = {};
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+function cleanUpNextTick() {
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = setTimeout(cleanUpNextTick);
+    draining = true;
+    var len = queue.length;
+    while (len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    clearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1;i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        setTimeout(drainQueue, 0);
+    }
+};
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; //  empty string to avoid regexp issues
+process.versions = {};
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+process.cwd = function () {
+    return '/';
+};
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function () {
+    return 0;
+};
+
+
+},{}],109:[function(require,module,exports){
+(function (process){
+Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
+module.exports = function isBuffer(arg) {
+    return arg && typeof arg === 'object' && typeof arg.copy === 'function' && typeof arg.fill === 'function' && typeof arg.readUInt8 === 'function';
+};
+
+
+}).call(this,require('_process'))
+},{"_process":108}],110:[function(require,module,exports){
+(function (process,global){
+Function.prototype.$asyncbind=function anonymous(self,catcher /*``*/) { var resolver = this; if (catcher===true) { if (!Function.prototype.$asyncbind.EagerThenable) Function.prototype.$asyncbind.EagerThenable = function factory(tick){ var _tasks = [] ; if (!tick) { try { tick = process.nextTick ; } catch (ex) { tick = function(p) { setTimeout(p,0) } } } function _untask(){ for (var i=0; i<_tasks.length; i+=2) { var t = _tasks[i+1], r = _tasks[i] ; for (var j=0; j<t.length; j++) t[j].call(null,r) ; } _tasks = [] ; } function isThenable(obj) { return obj && (obj instanceof Object) && typeof obj.then==="function"; } function EagerThenable(resolver) { function done(inline){ var w ; if (_sync || phase<0 || (w = _thens[phase]).length===0) return ; _tasks.push(result,w) ; _thens = [[],[]] ; if (_tasks.length===2) inline?_untask():tick(_untask) ; } function resolveThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 0 ; result = x ; done(true) ; } function rejectThen(x){ if (phase>=0) return ; if (isThenable(x)) return x.then(resolveThen,rejectThen) ; phase = 1 ; result = x ; done(true) ; } function settler(resolver,rejecter){ _thens[0].push(resolver) ; _thens[1].push(rejecter) ; done() ; } function toString() { return "EagerThenable{"+{'-1':"pending",0:"resolved",1:"rejected"}[phase]+"}="+result.toString() ; } function guard() { try { resolver.call(null,resolveThen,rejectThen) ; } catch (ex) { rejectThen(ex) ; } } this.then = settler ; this.toString = toString ; var _thens = [[],[]], _sync = true, phase = -1, result ; guard() ; _sync = false ; done() ; } EagerThenable.resolve = function(v){ return isThenable(v) ? v : {then:function(resolve,reject){return resolve(v)}}; }; return EagerThenable ; }(); return new (Function.prototype.$asyncbind.EagerThenable)(boundThen); } if (catcher) { if (Function.prototype.$asyncbind.wrapAsyncStack) catcher = Function.prototype.$asyncbind.wrapAsyncStack(catcher); return then; } function then(result,error){ try { return result && (result instanceof Object) && typeof result.then==='function' ? result.then(then,catcher) : resolver.call(self,result,error||catcher); } catch (ex) { return (error||catcher)(ex); } } function boundThen(result,error) { return resolver.call(self,result,error); } boundThen.then = boundThen; return boundThen; };window.$error=window.$error||function(e){throw e};
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+var formatRegExp = /%[sdj%]/g;
+exports.format = function (f) {
+    if (!isString(f)) {
+        var objects = [];
+        for (var i = 0;i < arguments.length; i++) {
+            objects.push(inspect(arguments[i]));
+        }
+        return objects.join(' ');
+    }
+    var i = 1;
+    var args = arguments;
+    var len = args.length;
+    var str = String(f).replace(formatRegExp, function (x) {
+        if (x === '%%') 
+            return '%';
+        if (i >= len) 
+            return x;
+        switch (x) {
+            case '%s':
+                return String(args[i++]);
+            case '%d':
+                return Number(args[i++]);
+            case '%j':
+                try {
+                    return JSON.stringify(args[i++]);
+                } catch (_) {
+                    return '[Circular]';
+                }
+            default:
+                return x;
+        }
+    });
+    for (var x = args[i];i < len; x = args[++i]) {
+        if (isNull(x) || !isObject(x)) {
+            str += ' ' + x;
+        } else {
+            str += ' ' + inspect(x);
+        }
+    }
+    return str;
+};
+// Mark that a method should not be used.
+// Returns a modified function which warns once by default.
+// If --no-deprecation is set, then it is a no-op.
+exports.deprecate = function (fn, msg) {
+    // Allow for deprecating things in the process of starting up.
+    if (isUndefined(global.process)) {
+        return function () {
+            return exports.deprecate(fn, msg).apply(this, arguments);
+        };
+    }
+    if (process.noDeprecation === true) {
+        return fn;
+    }
+    var warned = false;
+    function deprecated() {
+        if (!warned) {
+            if (process.throwDeprecation) {
+                throw new Error(msg);
+            } else if (process.traceDeprecation) {
+                console.trace(msg);
+            } else {
+                console.error(msg);
+            }
+            warned = true;
+        }
+        return fn.apply(this, arguments);
+    }
+    
+    return deprecated;
+};
+var debugs = {};
+var debugEnviron;
+exports.debuglog = function (set) {
+    if (isUndefined(debugEnviron)) 
+        debugEnviron = process.env.NODE_DEBUG || '';
+    set = set.toUpperCase();
+    if (!debugs[set]) {
+        if (new RegExp('\\b' + set + '\\b', 'i').test(debugEnviron)) {
+            var pid = process.pid;
+            debugs[set] = function () {
+                var msg = exports.format.apply(exports, arguments);
+                console.error('%s %d: %s', set, pid, msg);
+            };
+        } else {
+            debugs[set] = function () {};
+        }
+    }
+    return debugs[set];
+};
+/**
+ * Echos the value of a value. Trys to print the value out
+ * in the best way possible given the different types.
+ *
+ * @param {Object} obj The object to print out.
+ * @param {Object} opts Optional options object that alters the output.
+ */
+/* legacy: obj, showHidden, depth, colors*/
+function inspect(obj, opts) {
+    // default options
+    var ctx = {
+        seen: [],
+        stylize: stylizeNoColor
+    };
+    // legacy...
+    if (arguments.length >= 3) 
+        ctx.depth = arguments[2];
+    if (arguments.length >= 4) 
+        ctx.colors = arguments[3];
+    if (isBoolean(opts)) {
+        // legacy...
+        ctx.showHidden = opts;
+    } else if (opts) {
+        // got an "options" object
+        exports._extend(ctx, opts);
+    }
+    // set default options
+    if (isUndefined(ctx.showHidden)) 
+        ctx.showHidden = false;
+    if (isUndefined(ctx.depth)) 
+        ctx.depth = 2;
+    if (isUndefined(ctx.colors)) 
+        ctx.colors = false;
+    if (isUndefined(ctx.customInspect)) 
+        ctx.customInspect = true;
+    if (ctx.colors) 
+        ctx.stylize = stylizeWithColor;
+    return formatValue(ctx, obj, ctx.depth);
+}
+
+exports.inspect = inspect;
+// http://en.wikipedia.org/wiki/ANSI_escape_code#graphics
+inspect.colors = {
+    'bold': [1,22],
+    'italic': [3,23],
+    'underline': [4,24],
+    'inverse': [7,27],
+    'white': [37,39],
+    'grey': [90,39],
+    'black': [30,39],
+    'blue': [34,39],
+    'cyan': [36,39],
+    'green': [32,39],
+    'magenta': [35,39],
+    'red': [31,39],
+    'yellow': [33,39]
+};
+// Don't use 'blue' not visible on cmd.exe
+inspect.styles = {
+    'special': 'cyan',
+    'number': 'yellow',
+    'boolean': 'yellow',
+    'undefined': 'grey',
+    'null': 'bold',
+    'string': 'green',
+    'date': 'magenta',
+    // "name": intentionally not styling
+    'regexp': 'red'
+};
+function stylizeWithColor(str, styleType) {
+    var style = inspect.styles[styleType];
+    if (style) {
+        return '\u001b[' + inspect.colors[style][0] + 'm' + str + '\u001b[' + inspect.colors[style][1] + 'm';
+    } else {
+        return str;
+    }
+}
+
+function stylizeNoColor(str, styleType) {
+    return str;
+}
+
+function arrayToHash(array) {
+    var hash = {};
+    array.forEach(function (val, idx) {
+        hash[val] = true;
+    });
+    return hash;
+}
+
+function formatValue(ctx, value, recurseTimes) {
+    // Provide a hook for user-specified inspect functions.
+    // Check that value is an object with an inspect function on it
+    // Filter out the util module, it's inspect function is special
+    // Also filter out any prototype objects using the circular check.
+    if (ctx.customInspect && value && isFunction(value.inspect) && value.inspect !== exports.inspect && !(value.constructor && value.constructor.prototype === value)) {
+        var ret = value.inspect(recurseTimes, ctx);
+        if (!isString(ret)) {
+            ret = formatValue(ctx, ret, recurseTimes);
+        }
+        return ret;
+    }
+    // Primitive types cannot have properties
+    var primitive = formatPrimitive(ctx, value);
+    if (primitive) {
+        return primitive;
+    }
+    // Look up the keys of the object.
+    var keys = Object.keys(value);
+    var visibleKeys = arrayToHash(keys);
+    if (ctx.showHidden) {
+        keys = Object.getOwnPropertyNames(value);
+    }
+    // IE doesn't make error fields non-enumerable
+    // http://msdn.microsoft.com/en-us/library/ie/dww52sbt(v=vs.94).aspx
+    if (isError(value) && (keys.indexOf('message') >= 0 || keys.indexOf('description') >= 0)) {
+        return formatError(value);
+    }
+    // Some type of object without properties can be shortcutted.
+    if (keys.length === 0) {
+        if (isFunction(value)) {
+            var name = value.name ? ': ' + value.name : '';
+            return ctx.stylize('[Function' + name + ']', 'special');
+        }
+        if (isRegExp(value)) {
+            return ctx.stylize(RegExp.prototype.toString.call(value), 'regexp');
+        }
+        if (isDate(value)) {
+            return ctx.stylize(Date.prototype.toString.call(value), 'date');
+        }
+        if (isError(value)) {
+            return formatError(value);
+        }
+    }
+    var base = '', array = false, braces = ['{','}'];
+    // Make Array say that they are Array
+    if (isArray(value)) {
+        array = true;
+        braces = ['[',']'];
+    }
+    // Make functions say that they are functions
+    if (isFunction(value)) {
+        var n = value.name ? ': ' + value.name : '';
+        base = ' [Function' + n + ']';
+    }
+    // Make RegExps say that they are RegExps
+    if (isRegExp(value)) {
+        base = ' ' + RegExp.prototype.toString.call(value);
+    }
+    // Make dates with properties first say the date
+    if (isDate(value)) {
+        base = ' ' + Date.prototype.toUTCString.call(value);
+    }
+    // Make error with message first say the error
+    if (isError(value)) {
+        base = ' ' + formatError(value);
+    }
+    if (keys.length === 0 && (!array || value.length == 0)) {
+        return braces[0] + base + braces[1];
+    }
+    if (recurseTimes < 0) {
+        if (isRegExp(value)) {
+            return ctx.stylize(RegExp.prototype.toString.call(value), 'regexp');
+        } else {
+            return ctx.stylize('[Object]', 'special');
+        }
+    }
+    ctx.seen.push(value);
+    var output;
+    if (array) {
+        output = formatArray(ctx, value, recurseTimes, visibleKeys, keys);
+    } else {
+        output = keys.map(function (key) {
+            return formatProperty(ctx, value, recurseTimes, visibleKeys, key, array);
+        });
+    }
+    ctx.seen.pop();
+    return reduceToSingleString(output, base, braces);
+}
+
+function formatPrimitive(ctx, value) {
+    if (isUndefined(value)) 
+        return ctx.stylize('undefined', 'undefined');
+    if (isString(value)) {
+        var simple = '\'' + JSON.stringify(value).replace(/^"|"$/g, '').replace(/'/g, "\\'").replace(/\\"/g, '"') + '\'';
+        return ctx.stylize(simple, 'string');
+    }
+    if (isNumber(value)) 
+        return ctx.stylize('' + value, 'number');
+    if (isBoolean(value)) 
+        return ctx.stylize('' + value, 'boolean');
+    // For some reason typeof null is "object", so special case here.
+    if (isNull(value)) 
+        return ctx.stylize('null', 'null');
+}
+
+function formatError(value) {
+    return '[' + Error.prototype.toString.call(value) + ']';
+}
+
+function formatArray(ctx, value, recurseTimes, visibleKeys, keys) {
+    var output = [];
+    for (var i = 0, l = value.length;i < l; ++i) {
+        if (hasOwnProperty(value, String(i))) {
+            output.push(formatProperty(ctx, value, recurseTimes, visibleKeys, String(i), true));
+        } else {
+            output.push('');
+        }
+    }
+    keys.forEach(function (key) {
+        if (!key.match(/^\d+$/)) {
+            output.push(formatProperty(ctx, value, recurseTimes, visibleKeys, key, true));
+        }
+    });
+    return output;
+}
+
+function formatProperty(ctx, value, recurseTimes, visibleKeys, key, array) {
+    var name, str, desc;
+    desc = Object.getOwnPropertyDescriptor(value, key) || {
+        value: value[key]
+    };
+    if (desc.get) {
+        if (desc.set) {
+            str = ctx.stylize('[Getter/Setter]', 'special');
+        } else {
+            str = ctx.stylize('[Getter]', 'special');
+        }
+    } else {
+        if (desc.set) {
+            str = ctx.stylize('[Setter]', 'special');
+        }
+    }
+    if (!hasOwnProperty(visibleKeys, key)) {
+        name = '[' + key + ']';
+    }
+    if (!str) {
+        if (ctx.seen.indexOf(desc.value) < 0) {
+            if (isNull(recurseTimes)) {
+                str = formatValue(ctx, desc.value, null);
+            } else {
+                str = formatValue(ctx, desc.value, recurseTimes - 1);
+            }
+            if (str.indexOf('\n') > -1) {
+                if (array) {
+                    str = str.split('\n').map(function (line) {
+                        return '  ' + line;
+                    }).join('\n').substr(2);
+                } else {
+                    str = '\n' + str.split('\n').map(function (line) {
+                        return '   ' + line;
+                    }).join('\n');
+                }
+            }
+        } else {
+            str = ctx.stylize('[Circular]', 'special');
+        }
+    }
+    if (isUndefined(name)) {
+        if (array && key.match(/^\d+$/)) {
+            return str;
+        }
+        name = JSON.stringify('' + key);
+        if (name.match(/^"([a-zA-Z_][a-zA-Z_0-9]*)"$/)) {
+            name = name.substr(1, name.length - 2);
+            name = ctx.stylize(name, 'name');
+        } else {
+            name = name.replace(/'/g, "\\'").replace(/\\"/g, '"').replace(/(^"|"$)/g, "'");
+            name = ctx.stylize(name, 'string');
+        }
+    }
+    return name + ': ' + str;
+}
+
+function reduceToSingleString(output, base, braces) {
+    var numLinesEst = 0;
+    var length = output.reduce(function (prev, cur) {
+        numLinesEst++;
+        if (cur.indexOf('\n') >= 0) 
+            numLinesEst++;
+        return prev + cur.replace(/\u001b\[\d\d?m/g, '').length + 1;
+    }, 0);
+    if (length > 60) {
+        return braces[0] + (base === '' ? '' : base + '\n ') + ' ' + output.join(',\n  ') + ' ' + braces[1];
+    }
+    return braces[0] + base + ' ' + output.join(', ') + ' ' + braces[1];
+}
+
+// NOTE: These type checking functions intentionally don't use `instanceof`
+// because it is fragile and can be easily faked with `Object.create()`.
+function isArray(ar) {
+    return Array.isArray(ar);
+}
+
+exports.isArray = isArray;
+function isBoolean(arg) {
+    return typeof arg === 'boolean';
+}
+
+exports.isBoolean = isBoolean;
+function isNull(arg) {
+    return arg === null;
+}
+
+exports.isNull = isNull;
+function isNullOrUndefined(arg) {
+    return arg == null;
+}
+
+exports.isNullOrUndefined = isNullOrUndefined;
+function isNumber(arg) {
+    return typeof arg === 'number';
+}
+
+exports.isNumber = isNumber;
+function isString(arg) {
+    return typeof arg === 'string';
+}
+
+exports.isString = isString;
+function isSymbol(arg) {
+    return typeof arg === 'symbol';
+}
+
+exports.isSymbol = isSymbol;
+function isUndefined(arg) {
+    return arg === void 0;
+}
+
+exports.isUndefined = isUndefined;
+function isRegExp(re) {
+    return isObject(re) && objectToString(re) === '[object RegExp]';
+}
+
+exports.isRegExp = isRegExp;
+function isObject(arg) {
+    return typeof arg === 'object' && arg !== null;
+}
+
+exports.isObject = isObject;
+function isDate(d) {
+    return isObject(d) && objectToString(d) === '[object Date]';
+}
+
+exports.isDate = isDate;
+function isError(e) {
+    return isObject(e) && (objectToString(e) === '[object Error]' || e instanceof Error);
+}
+
+exports.isError = isError;
+function isFunction(arg) {
+    return typeof arg === 'function';
+}
+
+exports.isFunction = isFunction;
+function isPrimitive(arg) {
+    return arg === null || typeof arg === 'boolean' || typeof arg === 'number' || typeof arg === 'string' || typeof arg === 'symbol' || typeof arg === 'undefined'; //  ES6 symbol
+}
+
+exports.isPrimitive = isPrimitive;
+exports.isBuffer = require('./support/isBuffer');
+function objectToString(o) {
+    return Object.prototype.toString.call(o);
+}
+
+function pad(n) {
+    return n < 10 ? '0' + n.toString(10) : n.toString(10);
+}
+
+var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+// 26 Feb 16:19:34
+function timestamp() {
+    var d = new Date();
+    var time = [pad(d.getHours()),pad(d.getMinutes()),pad(d.getSeconds())].join(':');
+    return [d.getDate(),months[d.getMonth()],time].join(' ');
+}
+
+// log is just a thin wrapper to console.log that prepends a timestamp
+exports.log = function () {
+    console.log('%s - %s', timestamp(), exports.format.apply(exports, arguments));
+};
+/**
+ * Inherit the prototype methods from one constructor into another.
+ *
+ * The Function.prototype.inherits from lang.js rewritten as a standalone
+ * function (not on Function.prototype). NOTE: If this file is to be loaded
+ * during bootstrapping this function needs to be rewritten using some native
+ * functions as prototype setup using normal JavaScript does not work as
+ * expected during bootstrapping (see mirror.js in r114903).
+ *
+ * @param {function} ctor Constructor function which needs to inherit the
+ *     prototype.
+ * @param {function} superCtor Constructor function to inherit prototype from.
+ */
+exports.inherits = require('inherits');
+exports._extend = function (origin, add) {
+    // Don't do anything if add isn't an object
+    if (!add || !isObject(add)) 
+        return origin;
+    var keys = Object.keys(add);
+    var i = keys.length;
+    while (i--) {
+        origin[keys[i]] = add[keys[i]];
+    }
+    return origin;
+};
+function hasOwnProperty(obj, prop) {
+    return Object.prototype.hasOwnProperty.call(obj, prop);
+}
+
+
+}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"./support/isBuffer":109,"_process":108,"inherits":106}]},{},[3]);
