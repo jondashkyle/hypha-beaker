@@ -1,6 +1,8 @@
 var objectValues = require('object-values')
 var html = require('choo/html')
 
+var utilsContent = require('../utils/content')
+
 module.exports = view
 
 function view (state, emit) {
@@ -21,28 +23,37 @@ function view (state, emit) {
     <div class="usn ttu">
       <div class="psr">
         <div class="x xw p0-5">
-          ${shuffle(renderPageImages(interviews)).splice(0, 12)}
+          ${utilsContent.shuffle(renderPageImages(interviews))
+              .splice(0, 12)
+              .map(function (image) {
+                return html`
+                  <div class="c4 p0-5">
+                    ${image}
+                  </div>
+                `
+              })
+          }
         </div>
-        <div class="x xjc xac psa t0 l0 r0 b0">
-          <div class="p2 psa t0 l0">
+        <div class="x xjc xac psa t0 l0 r0 b0 pen">
+          <div class="p2 psa t0 l0 fs0-5">
             ${Math.floor(new Date() / 1000)}
           </div>
-          <div class="p2 psa t0 r0">
+          <div class="p2 psa b0 r0 pea z2">
             <a href="/information" class="fc-white tdn">${info.title}</a>
           </div>
           <div class="p2 fs4 ha psr z2 tac">
-            ${shuffle(interviews).map(function (page, i) {
+            ${utilsContent.shuffle(interviews).map(function (page, i) {
               return [
                 i === 0 ? html`<span class="curd">${state.page.heading}</span>` : '',
                 html`<div class="circle"></div>`,
-                html`<a href="${page.url}" class="curp fc-white tdn">${page.title}</a>`
+                createLink(page)
               ]
             })}
           </div>
         </div>
       </div>
       <div>
-        ${shuffle(performances).map(function (page, i) {
+        ${utilsContent.shuffle(performances).map(function (page, i) {
           var images = objectValues(page.files).filter(file => file.type === 'image')
           var image = images[Math.floor(Math.random() * images.length)] 
           if (!image) return
@@ -53,7 +64,7 @@ function view (state, emit) {
               style="background-image: url(${image.path})"
             >
               <div class="psa t0 l0 r0 b0 x xjc xac tac">
-                ${page.artist} @ ${page.venue}
+                ${page.title} @ ${page.venue}
               </div>
               <div style="padding-bottom: 56.25%"></div>
             </a>
@@ -62,42 +73,50 @@ function view (state, emit) {
       </div>
     </div>
   `
-}
 
-function renderPageImages (pages) {
-  return pages.reduce(function (result, page, i) {
-    if (!page.files) return
-    var images = objectValues(page.files).filter(file => file.type === 'image')
-    result.push(randomImage(images, page))
-    result.push(randomImage(images, page))
-    result.push(randomImage(images, page))
-    return result
-  }, [ ])
-}
-
-function randomImage (images, page) {
-  var image = images[Math.floor(Math.random() * images.length)]
-  return html`
-    <div class="c4 p0-5">
+  function createLink (props) {
+    var visited = state.visited[props.url]
+    return html`
       <a
-        href="${page.url}"
-        class="bgc-white db curp bgsc bgrn bgpc w100"
-        style="background-image: url(${image.path})"
-      ><div style="padding-bottom: 100%"></div></a>
-    </div>
-  `
-}
-
-function shuffle (array) {
-  let counter = array.length
-
-  while (counter > 0) {
-    let index = Math.floor(Math.random() * counter)
-    counter--
-    let temp = array[counter]
-    array[counter] = array[index]
-    array[index] = temp
+        href="${props.url}"
+        class="curp ${visited ? 'line-through' : ''} fc-white tdn pea"
+      >${props.title}</a>
+    `
   }
 
-  return array
+  function renderPageImages (pages) {
+    return pages.reduce(function (result, props, i) {
+      if (!props.files) return
+      var visited = state.visited[props.url]
+      var images = objectValues(props.files).filter(file => file.type === 'image')
+      result.push(randomImage())
+      result.push(randomImage())
+      result.push(randomImage())
+      return result
+
+      function randomImage () {
+        var image = images[Math.floor(Math.random() * images.length)]
+
+        return html`
+          <a
+            href="${props.url}"
+            class="psr bgc-white db curp bgsc bgrn bgpc w100"
+            style="background-image: url(${image.path})"
+          >
+            ${visited ? ex() : ''}
+            <div style="padding-bottom: 100%"></div>
+          </a>
+        `
+      }
+    }, [ ])
+  }
+}
+
+function ex () {
+  return html`
+    <div
+      class="z2 psa t0 l0 r0 b0 bgsct bgrn bgpc w100"
+      style="background-image: url(/assets/x.svg)"
+    ></div>
+  `
 }

@@ -1,5 +1,6 @@
 module.exports = {
+  performance: require('./performance'),
   default: require('./main'),
   home: require('./home'),
-  performance: require('./performance')
+  info: require('./info')
 }

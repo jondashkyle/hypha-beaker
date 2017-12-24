@@ -8,33 +8,45 @@ var view = require('../views/main')
 module.exports = store
 
 async function store (state, emitter, app) {
-  state.content = { }
-  state.visited = [ ]
-  state.p2p = typeof DatArchive !== 'undefined'
-  state.loaded = false
-  state.online = true
-
   var archive = new DatArchive(window.location.toString())
   var options = { fs: archive, parent: '/content' }
 
-  try {
-    var files = await getFiles()
-    var content = await hypha.readFiles(files, '/content', options)
+  state.content = { }
+  state.visited = { }
+  state.loaded = false
+  state.online = navigator.onLine
+  state.p2p = typeof DatArchive !== 'undefined'
 
-    objectValues(content).forEach(function (page) {
-      state.content[page.url] = page
-    })
-  } catch (err) {
-    console.log(err)
+  // events
+  state.events.VISITED = 'visited'
+
+  // event handlers
+  emitter.on(state.events.VISITED, handleVisit)
+
+  // initialize
+  await loadDatSite()
+
+  async function loadDatSite () {
+    try {
+      var files = await getDatFiles()
+      var content = await hypha.readFiles(files, '/content', options)
+      objectValues(content).forEach(function (page) {
+        state.content[page.url] = page
+      })
+    } catch (err) {
+      console.log(err)
+      state.p2p = false
+    }
+
+    state.loaded = true
+    emitter.emit(state.events.RENDER)
   }
 
-  state.loaded = true
-  emitter.emit(state.events.RENDER)
+  function handleVisit (data) {
+    state.visited[data.url] = true
+  }
 
-  if (typeof callback === 'function') callback(content)
-  return content
-
-  async function getFiles () {
+  async function getDatFiles () {
     var files = await archive.readdir('/content', { recursive: true })
     files = files.map(function (file) { return '/content/' + file }) // funny hack
     return files

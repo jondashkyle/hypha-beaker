@@ -30,6 +30,10 @@ module.exports = `
     top: 0.45em;
   }
 
+  .ofct {
+    object-fit: contain;
+  }
+
   .circle {
     background: #fff;
     border-radius: 50%;
@@ -37,6 +41,12 @@ module.exports = `
     margin: 0 0.2em;
     height: 0.8em;
     width: 0.8em;
+  }
+
+  .line-through {
+    background-image: url(/assets/line.svg);
+    background-size: 1em;
+    background-repeat: repeat;
   }
 
   .wbba {
