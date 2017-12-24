@@ -1,5 +1,7 @@
 title: Information
 ----
+view: info
+----
 tags:
   - one
   - two

@@ -1,5 +1,6 @@
 title: Photek
 ----
-source: TyKuzY52hWU
+sources:
+  - TyKuzY52hWU
 ----
 text: niceeerrr

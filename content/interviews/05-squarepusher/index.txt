@@ -1,6 +1,7 @@
 title: Squarepusher
 ----
-source: 96PfTcGHZ4Q
+sources:
+  - 96PfTcGHZ4Q
 ----
 ratio: 75
 ----

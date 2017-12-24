@@ -6,6 +6,8 @@ tags:
   - one
   - two
 ----
-heading: Several videos of interviews and performances I find enjoyable and hope you do too 
+heading: Several interviews and performances I find enjoyable and hope you do too 
 ----
 text: what up what up
+----
+offline: This demo uses Youtube to stream large video files, which is not accessible offline

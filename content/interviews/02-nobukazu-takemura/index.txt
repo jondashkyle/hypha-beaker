@@ -1,5 +1,6 @@
 title: Nobukazu Takemura
 ----
-source: Rg2oBs2-V7I
+sources:
+  - Rg2oBs2-V7I
 ----
 text: yeah

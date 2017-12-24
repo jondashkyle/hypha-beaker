@@ -1,8 +1,6 @@
-artist: Squarepusher
+title: Squarepusher
 ----
 venue: Fujirock Fest
-----
-view: performance
 ----
 artist: Squarepusher
 ----
