@@ -1,4 +1,4 @@
-title: Yo whats good!
+title: Homepage
 ----
 tags:
   - one

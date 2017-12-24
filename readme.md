@@ -5,11 +5,20 @@ A little single-page-app style site generator for Beaker using [Hypha](https://g
 ## Usage
 
 - Format a directory of content as described in the [Hypha documentation](https://github.com/jondashkyle/hypha).
-- Build a choo app to render your content `/site`
+- A choo app renders your `/content`, as defined by source in `/site`
 
-## Customization
+## Installation
 
-- Run `npm install` inside `/site` to install the dependencies.
+- Clone the archive into an empty Dat
+- Run `npm install` inside `/site` to install the dependencies
+- Run `npm build` to build the source
+
+Of course, you can also just go ahead and clone the Dat archive to get all the bundled files.
+
+`dat://5b269ae56e15bd3b22c19a382c92be96bc427888f57576609477d95dc9f5796e/`
+
+## Development
+
 - Run `npm start` to watch for changes to your site’s source during dev.
 - Run `npm run build` to build your site!
 
