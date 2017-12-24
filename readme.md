@@ -28,4 +28,5 @@ Of course, you can also just go ahead and clone the Dat archive to get all the b
 
 ## Todo
 
-- Use the Enoki Panel in /panel
+- [ ] Cleanup site source
+- [ ] Use the Enoki Panel in /panel
