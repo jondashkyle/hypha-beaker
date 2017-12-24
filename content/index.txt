@@ -1,0 +1,7 @@
+title: Yo whats good!
+----
+tags:
+  - one
+  - two
+----
+text: what up what up
