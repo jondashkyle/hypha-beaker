@@ -1,0 +1,25 @@
+artist: Squarepusher
+----
+venue: Fujirock Fest
+----
+view: performance
+----
+artist: Squarepusher
+----
+sources:
+  - X-nnHdj8fRg
+  - Kvjep424UGk
+----
+setlist:
+  - Mutilation Colony
+  - The Exploding Psychology
+  - My Red Hot Car
+  - Do You Know Squarepusher
+  - Direct to Mental
+  - Boneville Occident
+  - Go! Spastic
+  - Greenways Trajectory
+  - My Fucking Sound
+  - Anstromm-Feck 4 
+----
+text: hi

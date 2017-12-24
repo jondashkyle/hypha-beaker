@@ -1,7 +1,11 @@
 title: Homepage
 ----
+view: home
+----
 tags:
   - one
   - two
+----
+heading: Several videos of interviews and performances I find enjoyable and hope you do too 
 ----
 text: what up what up

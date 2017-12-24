@@ -1,0 +1,7 @@
+title: My Bloody Valentine
+----
+source: 8t8HxBF9FzM
+----
+ratio: 75
+----
+text: hey there

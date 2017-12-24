@@ -1,4 +1,4 @@
-title: Aboutness
+title: Information
 ----
 tags:
   - one
