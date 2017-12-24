@@ -2,4 +2,5 @@
 .dat
 
 node_modules
+bundles/*
 dat.json
