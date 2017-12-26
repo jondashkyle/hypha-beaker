@@ -2,6 +2,148 @@ title: Information
 ----
 view: info
 ----
-tags:
-  - one
-  - two
+text: This is a speculative example of generating a full site using [Hypha](https://github.com/jondashkyle/hypha) with [Choo](https://github.com/jondashkyle/hypha) in Beaker Browser. Although the codebase is quite readable, below is a comprehensive unpacking of what’s going on.
+
+To create our site we read the content inside the `content` directory, making use of the `hypha` module and a simple browserify setup. You can follow along and make changes by opening the `site` directory in your terminal, running `npm install`, then `npm start`.
+
+## Reading content
+
+Hypha accepts `fs` as an option. If undefined it falls back Node’s default `fs` lib. However, you can use any module as long as it exports an object exposing `fs.readFile()`, `fs.readdir()`, `fs.writeFile()` and `fs.mkdir()` functions.
+
+Hypha uses these functions to read a directory of static files into a site. Each directory is a page, and contains a text hyper-readable text file of fields and values using [Smarkt](https://github.com/jondashkyle/smarkt) (markdown and YAML) formatting.
+
+Beaker’s Web API exposes these functions by default. Let’s look at `site/stores/content.js` and deconstruct how our `content` directory generates the site’s routes and state.
+
+```
+async function store (state, emitter, app) {
+  var archive = new DatArchive(window.location.toString())
+  var contentDir = '/content'
+```
+
+Let’s create an async function with arguments for the app state, event emitter, and the Choo app instance. These arguments are provided by Choo when we `.use` the store within `site/index.js`.
+
+Beaker Browser uses Dat to share data across a peer-to-peer network. Here we are creating a new instance of the Web API for this site’s Dat Archive, using the location of the window to identify the Archive ID. We also define the directory containing our content.
+
+```
+  state.content = { }
+  state.loaded = false
+```
+
+Let’s set the default state required for our site’s content: `content` is an `object`, and `loaded` is a `bool` to indicate if our content loaded successfully, useful for displaying an error message on the site.
+
+```
+  loadContent(archive, contentDir)
+```
+
+Our content store is initialized by calling `loadContent()`, passing both the Dat Archive instance and the location of our content. Let’s take a look at that.
+
+```
+async function loadContent (archive, contentDir) {
+  try {
+    var options = { fs: archive, parent: contentDir }
+    var files = await archive.readdir(contentDir, { recursive: true })
+    var glob = files.map(function (file) { return path.join(contentDir, file) })
+    return await hypha.readFiles(glob, contentDir, options)
+  } catch (err) {
+    return { }
+  }
+}
+```
+
+Hypha’s `readFiles()` accepts an array of file paths, which we grab by using `archive.readdir()`. The `recursive` options allows us to glob over the entire content directory.
+
+Next we call Hypha’s asynchronous `readFiles()`, passing the glob of files, the parent content directory, and the options including the Web API (archive) exposing the custom Dat `fs` functions.
+
+In the case of an error we simply return an empty object.
+
+```
+  loadContent(archive, contentDir)
+    .then(handleLoad)
+    .catch(handleError)
+```
+
+`loadContent()` returns a promise. If successful the data passed as an argument to `handleLoad()`.
+
+```
+  function handleLoad (data) {
+    state.content = data
+    state.loaded = true
+
+    objectValues(data).forEach(function (page) {
+      state.content[page.url] = page
+    })
+
+    emitter.emit(state.events.RENDER)
+  }
+```
+
+## Setting state
+
+Hypha’s `readFiles()` returns an object. Each key in the object represents the path to a directory:
+
+```
+{
+  "/": { },
+  "/information": { },
+  "/interviews": { },
+  "/performances": { }'
+}
+```
+
+We now store this in state for easy access in views.
+
+```
+  function handleLoad (data) {
+    state.content = data
+    state.loaded = true
+    emitter.emit(state.events.RENDER)
+  }
+```
+
+Let’s look at `site/views/wrapper.js` to see how we determine the active page, and pass the related content to each view.
+
+## Creating views
+
+```
+function wrapper (state, emit) {
+  var page = state.content[state.href || '/'] || { }
+  var view = getView()
+
+  state = xtend(state, { page: page })
+
+  return body(view(state, emit))
+```
+
+You can see this is quite simple. Choo passes the `href` (path) to the view via state and we fallback to the index if none is available. We use this to select a route within `state.content`—that flat object where each key is the path for a page.
+
+Next we grab the view. This example site has a possible states, which has been abstracted inside a function, but essentially grabs a different view depending upon:
+
+- Content not loaded/loaded
+- Dat API (p2p) available/unavailable
+- Route match/no match
+
+Next we compose the view in `body()`, which is where we can place global elements we’d like to persist across views without being required to redeclare them all the time. 
+
+Lastly we extend our state with `{ page: page }`, enabling us to call `state.page` within our view to access the page fields as defined.
+
+## Access pages and sub-pages
+
+One of the real conveniences of a flat object following the ` { [route]: [fields] }` format is accessing fields from other pages. Instead of traversing up and down an object, you can simply do things like this:
+
+```
+state.content['/information']
+state.content['/performances/autechre-brixton']
+```
+
+Since this is so convenient, rather than nesting sub-page fields within a page, we simply store sub-page paths as an object in `page.pages` and compare against the `content` object. For instance:
+
+```
+objectValues(state.page.pages).map(function (page) {
+  page = state.content[page.url]
+  return html`<a href="${page.url}">${page.name}</a>`
+})
+```
+
+## Takeaway
+
+Hopefully this makes some sense. Basically; it‘s so nice working with static files to create a site. Plain text is so portable—there is no lockin. Dat and Beaker have some interesting affordances which enable you to read and write to the file system directly. Your site essentially becomes a hyper-specific and designed file browser.
