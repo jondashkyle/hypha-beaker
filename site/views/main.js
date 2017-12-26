@@ -37,14 +37,16 @@ function view (state, emit) {
         return html`<a href="${page.url}">${page.name}</a>`
       })}
       ${page.sources ? createVideos() : ''}
-      ${page.setlist ? createSetlist() : ''}
-      ${imageGrid({
-        images: images
-      })}
+      <div class="x xw p0-5">
+        ${page.setlist ? createSetlist() : ''}
+        ${imageGrid({
+          images: images
+        })}
+      </div>
       <ol class="p1">
         ${images.map(function (file, i) {
           return html`<li class="x">  
-            <div class="c2">${('0'+i).slice(-2)}</div>
+            <div class="c2">${('0'+(i+1)).slice(-2)}</div>
             <div class="c10">${file.filename}</div>
           </li>`
         })}
@@ -64,7 +66,7 @@ function view (state, emit) {
 
   function createSetlist () {
     return html`
-      <div class="x c12 p0-5">
+      <div class="x c12">
         <div class="c3 p0-5">
           Setlist
         </div>

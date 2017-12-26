@@ -38,8 +38,8 @@ function view (state, emit) {
           <div class="p2 psa t0 l0 fs0-5">
             ${Math.floor(new Date() / 1000)}
           </div>
-          <div class="p2 psa b0 r0 pea z2">
-            <a href="/information" class="fc-white tdn">${info.title}</a>
+          <div class="p2 psa b0 r0 l0 z2 fs2 tac">
+            <a href="/information" class="pea fc-white tdn">${info.title}</a>
           </div>
           <div class="p2 fs4 ha psr z2 tac">
             ${utilsContent.shuffle(interviews).map(function (page, i) {

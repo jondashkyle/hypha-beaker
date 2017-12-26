@@ -4,13 +4,14 @@ module.exports = imageGrid
 
 function imageGrid (props) {
   if (!props) return
+  var input = props.images.slice(0)
   var result = [ ]
   var last = 1
   var total = 0
   groupImages()
 
   return html`
-    <div class="w100 p0-5">
+    <div class="w100">
       ${result.map(function (row) {
         return html`
           <div class="x">
@@ -25,8 +26,8 @@ function imageGrid (props) {
   `
 
   function groupImages () {
-    result.push(props.images.splice(0, getAmount()))
-    if (props.images.length > 0) groupImages()
+    result.push(input.splice(0, getAmount()))
+    if (input.length > 0) groupImages()
   }
 
   function getAmount () {

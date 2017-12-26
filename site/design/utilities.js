@@ -25,6 +25,13 @@ utils.push({
   vals: options.colors
 })
 
+utils.push({
+  prop: { fc: 'color' },
+  join: '-',
+  tail: ' a',
+  vals: options.colors
+})
+
 module.exports = [
   reset,
   gr8({

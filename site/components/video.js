@@ -9,7 +9,7 @@ function component (id, props) {
 
   return html`
     <div
-      class="psr w100 bgc-white fc-black"
+      class="psr w100"
       style="padding-bottom: ${ratio}%"
     >${content()}</div>
   `
@@ -22,7 +22,7 @@ function component (id, props) {
 
   function createOffline () {
     return html`
-      <div class="psa t0 l0 r0 b0 x xjc xac fs2 p2 tac ttu">
+      <div class="bgc-white fc-black psa t0 l0 r0 b0 x xjc xac fs2 p2 tac ttu">
         ${props.textOffline}
       </div>
     `
