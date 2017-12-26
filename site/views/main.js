@@ -1,4 +1,6 @@
 var objectValues = require('object-values')
+var markdown = require('marked')
+var raw = require('choo/html/raw')
 var html = require('choo/html')
 
 var imageLightbox = require('../components/image-lightbox')
@@ -38,6 +40,7 @@ function view (state, emit) {
       })}
       ${page.sources ? createVideos() : ''}
       <div class="x xw p0-5">
+        ${page.text ? createText() : ''}
         ${page.setlist ? createSetlist() : ''}
         ${imageGrid({
           images: images
@@ -62,6 +65,16 @@ function view (state, emit) {
         ratio: page.ratio
       })
     })
+  }
+
+  function createText () {
+    return html`
+      <div class="p0-5 ttn lh1-5 c8 co4">
+        <div class="copy">
+          ${raw(markdown(page.text, { smartypants: true }))}
+        </div>
+      </div>
+    `
   }
 
   function createSetlist () {
