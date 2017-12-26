@@ -3,4 +3,8 @@ title: Photek
 sources:
   - TyKuzY52hWU
 ----
-text: niceeerrr
+text:
+
+“I feel like there was definitely a concept behind it…but I’m not sure how well I could articulate it, even now. I mean, that’s how the title, Modus Operandi, came about in the first place: back then so many different people, in interviews or whatever, were asking me to define jungle. The way I chose to define it to them was as a style of programming, a style of using sonics to make music, as opposed to using instruments to make music. This was music purely about soundscapes, space, bass…and you can forget how hard this was to explain to some people at the time. And at the same time , it was quite open: I felt like any style or tempo of music could fit on Modus Operandi if it was sonically right. And yeah, I’d thought a lot about the whole package: I knew what the colour scheme for the artwork was boing to be, I knew what the atmosphere was going to be like, you know?”
+
+[Source](http://www.factmag.com/2012/07/28/photek-reflects-on-modus-operandi-his-classic-1997-debut-album/)

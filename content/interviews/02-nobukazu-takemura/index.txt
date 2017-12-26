@@ -3,4 +3,10 @@ title: Nobukazu Takemura
 sources:
   - Rg2oBs2-V7I
 ----
-text: yeah
+ratio: 75
+----
+text:
+
+Nobukazu Takemura (竹村延和 Takemura Nobukazu) is a Japanese musician and artist whose style has run from jazz to house to drum and bass to chamber music to electronic glitch within less than a decade. Born in Hirakata, Osaka in August 1968, he became interested in music at a young age by listening to the radio, and began to make music at home with a tape recorder and keyboard.
+
+During high school, after a record store job that exposed him to jazz and hip hop, he had regular gigs in the clubs of Osaka and Kyoto as a battle DJ before launching his music career.

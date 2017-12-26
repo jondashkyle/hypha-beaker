@@ -108,7 +108,6 @@ Let’s look at `site/views/wrapper.js` to see how we determine the active page,
 function wrapper (state, emit) {
   var page = state.content[state.href || '/'] || { }
   var view = getView()
-
   state = xtend(state, { page: page })
 
   return body(view(state, emit))

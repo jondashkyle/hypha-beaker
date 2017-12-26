@@ -5,4 +5,8 @@ sources:
 ----
 ratio: 75
 ----
-text: hey there
+text:
+
+In February 1989, My Bloody Valentine began recording their second studio album at Blackwing Studios in Southwark, London. Creation Records believed that the album could be recorded "in five days". However, it soon "became clear that wasn't going to happen". Following several unproductive months, during which Shields assumed main duties on the musical and technical aspects of the sessions, the band relocated to a total of nineteen other studios and hired a number of engineers, including Alan Moulder, Anjali Dutt and Guy Fixsen.
+
+Due to the extensive recording time, Shields and Alan McGee agreed to release another EP and subsequently the band released Glider in April 1990. Containing the lead single "Soon", which featured the first recorded use of Shields' "glide guitar" technique, the EP peaked at number 2 on the UK Indie Chart and the band toured in summer 1990 to support its release. In February 1991, while still recording their second album, My Bloody Valentine released Tremolo, which was another critical success and topped the UK Indie Chart.
