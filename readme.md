@@ -57,6 +57,8 @@ view: example
 
 You can see how this can easily be extended to exposing any number of options by using the value of a field to select a key within an object in your build.
 
+For a more comprehensive unpacking of how this works, take a look at the [information page](content/information/index.txt).
+
 ## Notes
 
 - If cloning into a Dat archive within Beaker, ensure you edit your `dat.json` file to include `{ "fallback_page": "index.html" }`. This will be fixed in an upcoming version of Beaker.
