@@ -17,8 +17,8 @@ function wrapper (state, emit) {
 
   function getView () {
     if (isNotFound()) return notfound
-    else if (!state.p2p) return views.nonp2p
     else if (isLoading()) return loading
+    else if (!state.p2p) return views.nonp2p
     else return views[page.view] || views.default
   }
 
@@ -30,7 +30,7 @@ function wrapper (state, emit) {
   }
 
   function isLoading () {
-    return !state.loaded && state.p2p
+    return !state.loaded
   }
 }
 

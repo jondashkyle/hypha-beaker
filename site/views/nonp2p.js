@@ -6,7 +6,7 @@ var html = require('choo/html')
 module.exports = view
 
 var text = `
-  Download Beaker Browser and head to <a href="dat://beaker-hypha-jkm.hashbase.io/">dat://beaker-hypha-jkm.hashbase.io/</a>
+  Download <a href="https://beakerbrowser.com">Beaker Browser</a> and head to <a href="dat://beaker-hypha-jkm.hashbase.io/">dat://beaker-hypha-jkm.hashbase.io/</a>
 `
 
 function view (state, emit) {

@@ -70,8 +70,7 @@ function view (state, emit) {
   function createPerformances () {
     return utilsContent.shuffle(performances).map(function (page, i) {
       var images = objectValues(page.files).filter(file => file.type === 'image')
-      var image = images[Math.floor(Math.random() * images.length)] 
-      if (!image) return
+      var image = images[Math.floor(Math.random() * images.length)]  || { }
       return html`
         <a
           href="${page.url}"
@@ -116,9 +115,13 @@ function view (state, emit) {
       if (!props.files) return
       var visited = state.visited[props.url]
       var images = objectValues(props.files).filter(file => file.type === 'image')
+
+      if (!images.length) return result
+
       result.push(randomImage())
       result.push(randomImage())
       result.push(randomImage())
+
       return result
 
       function randomImage () {
