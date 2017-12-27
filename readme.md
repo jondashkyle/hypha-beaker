@@ -2,9 +2,9 @@
 
 ![](assets/example.jpg)
 
-<div align="center"><a href="dat://5b269ae56e15bd3b22c19a382c92be96bc427888f57576609477d95dc9f5796e/">dat://5b269ae56e15bd3b22c19a382c92be96bc427888f57576609477d95dc9f5796e/</a></div>
+<div align="center"><a href="https://beaker-hypha-jkm.hashbase.io/">https://beaker-hypha-jkm.hashbase.io/</a></div>
 
-<div align="center">A little single-page-app style site generator for <a href="http://beakerbrowser.com">Beaker Browser</a> using <a href="https://github.com/jondashkyle/hypha">Hypha</a> and <a href="https://github.com/choojs/choo">Choo</a>.</div>
+<div align="center">An experimental single-page-app style site generator for <a href="http://beakerbrowser.com">Beaker Browser</a> using <a href="https://github.com/jondashkyle/hypha">Hypha</a> and <a href="https://github.com/choojs/choo">Choo</a>.</div>
 
 ## Usage
 

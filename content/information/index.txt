@@ -16,30 +16,25 @@ Beaker’s Web API exposes these functions by default. Let’s look at `site/sto
 
 ```
 async function store (state, emitter, app) {
-  var archive = new DatArchive(window.location.toString())
   var contentDir = '/content'
-```
-
-Let’s create an async function with arguments for the app state, event emitter, and the Choo app instance. These arguments are provided by Choo when we `.use` the store within `site/index.js`.
-
-Beaker Browser uses Dat to share data across a peer-to-peer network. Here we are creating a new instance of the Web API for this site’s Dat Archive, using the location of the window to identify the Archive ID. We also define the directory containing our content.
-
-```
   state.content = { }
   state.loaded = false
 ```
 
-Let’s set the default state required for our site’s content: `content` is an `object`, and `loaded` is a `bool` to indicate if our content loaded successfully, useful for displaying an error message on the site.
+Let’s create an async function with arguments for the app state, event emitter, and the Choo app instance. These arguments are provided by Choo when we `.use` the store within `site/index.js`.
+
+At the beginning we  define the directory containing our content. Let’s also set the default state required for our site’s content: `content` is an `object`, and `loaded` is a `bool` to indicate if our content loaded successfully, useful for displaying an error message on the site.
 
 ```
-  loadContent(archive, contentDir)
+  loadContent(contentDir)
 ```
 
-Our content store is initialized by calling `loadContent()`, passing both the Dat Archive instance and the location of our content. Let’s take a look at that.
+Our content store is initialized by calling `loadContent()`, passing the location of our content. Let’s take a look at that.
 
 ```
 async function loadContent (archive, contentDir) {
   try {
+    var archive = new DatArchive(window.location.toString())
     var options = { fs: archive, parent: contentDir }
     var files = await archive.readdir(contentDir, { recursive: true })
     var glob = files.map(function (file) { return path.join(contentDir, file) })
@@ -49,6 +44,8 @@ async function loadContent (archive, contentDir) {
   }
 }
 ```
+
+Beaker Browser uses Dat to share data across a peer-to-peer network. Here we are creating a new instance of the Web API for this site’s Dat Archive, using the location of the window to identify the Archive ID.
 
 Hypha’s `readFiles()` accepts an array of file paths, which we grab by using `archive.readdir()`. The `recursive` options allows us to glob over the entire content directory.
 
