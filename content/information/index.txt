@@ -30,22 +30,23 @@ Let’s create an async function with arguments for the app state, event emitter
 At the beginning we  define the directory containing our content. Let’s also set the default state required for our site’s content: `content` is an `object`, and `loaded` is a `bool` to indicate if our content loaded successfully, useful for displaying an error message on the site.
 
 ```
-  loadContent(contentDir)
+  try {
+    state.content = await loadContent(contentDir)
+    state.p2p = true
+  } catch (err) {
+    state.p2p = false
+  }
 ```
 
-Our content store is initialized by calling `loadContent()`, passing the location of our content. Let’s take a look at that.
+Our content store is initialized by calling `loadContent()`, passing the location of our content. If it’s successful we store the returned object in our state, otherwise we note the Web API is not available.
 
 ```
 async function loadContent (archive, contentDir) {
-  try {
-    var archive = new DatArchive(window.location.toString())
-    var options = { fs: archive, parent: contentDir }
-    var files = await archive.readdir(contentDir, { recursive: true })
-    var glob = files.map(function (file) { return path.join(contentDir, file) })
-    return await hypha.readFiles(glob, contentDir, options)
-  } catch (err) {
-    return { }
-  }
+  var archive = new DatArchive(window.location.toString())
+  var options = { fs: archive, parent: contentDir }
+  var files = await archive.readdir(contentDir, { recursive: true })
+  var glob = files.map(function (file) { return path.join(contentDir, file) })
+  return await hypha.readFiles(glob, contentDir, options)
 }
 ```
 
@@ -53,34 +54,7 @@ Beaker Browser uses Dat to share data across a peer-to-peer network. Here we are
 
 Hypha’s `readFiles()` accepts an array of file paths, which we grab by using `archive.readdir()`. The `recursive` options allows us to glob over the entire content directory.
 
-Next we call Hypha’s asynchronous `readFiles()`, passing the glob of files, the parent content directory, and the options including the Web API (archive) exposing the custom Dat `fs` functions.
-
-In the case of an error we simply return an empty object.
-
-```
-  loadContent(archive, contentDir)
-    .then(handleLoad)
-    .catch(handleError)
-```
-
-`loadContent()` returns a promise. If successful the data passed as an argument to `handleLoad()`.
-
-```
-  function handleLoad (data) {
-    state.content = data
-    state.loaded = true
-
-    objectValues(data).forEach(function (page) {
-      state.content[page.url] = page
-    })
-
-    emitter.emit(state.events.RENDER)
-  }
-```
-
-## Setting state
-
-Hypha’s `readFiles()` returns an object. Each key in the object represents the path to a directory:
+Next we call Hypha’s asynchronous `readFiles()`, passing the glob of files, the parent content directory, and the options including the Web API (archive) exposing the custom Dat `fs` functions. An object is returned, each key representing a path to a directory:
 
 ```
 {
@@ -91,17 +65,7 @@ Hypha’s `readFiles()` returns an object. Each key in the object represents the
 }
 ```
 
-We now store this in state for easy access in views.
-
-```
-  function handleLoad (data) {
-    state.content = data
-    state.loaded = true
-    emitter.emit(state.events.RENDER)
-  }
-```
-
-Let’s look at `site/views/wrapper.js` to see how we determine the active page, and pass the related content to each view.
+As mentioned, we now store this in state for easy access in views. Let’s look at `site/views/wrapper.js` to see how we determine the active page, and pass the related content to each view.
 
 ## Creating views
 
