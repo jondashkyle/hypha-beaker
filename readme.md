@@ -8,6 +8,8 @@
 
 ## Usage
 
+I want my sites to be simple. Just a bunch of plain text files. I want to turn those files into a site without having to deal with a server, or apis, or build processes. I want it to be a calm thing. I want to share my site peer-to-peer and not depend on a centralized hosting platform. This is a stab at that.
+
 - Format a directory of content as described in the [Hypha documentation](https://github.com/jondashkyle/hypha).
 - A [Choo](http://github.com/choojs/choo) app renders your `/content`, as defined by source in `/site`
 
