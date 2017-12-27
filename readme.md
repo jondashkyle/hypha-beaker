@@ -1,13 +1,15 @@
-<h1 align="center">Hypha Beaker Example</h1>
+<h1 align="center">Hypha/Beaker Browser Example</h1>
 
 ![](assets/example.jpg)
 
-<div align="center">A little single-page-app style site generator for Beaker using <a href="https://github.com/jondashkyle/hypha">Hypha</a>.</div>
+<div align="center"><a href="`dat://5b269ae56e15bd3b22c19a382c92be96bc427888f57576609477d95dc9f5796e/`">dat://5b269ae56e15bd3b22c19a382c92be96bc427888f57576609477d95dc9f5796e/</a>
+
+<div align="center">A little single-page-app style site generator for <a href="http://beakerbrowser.com">Beaker Browser</a>a> using <a href="https://github.com/jondashkyle/hypha">Hypha</a> and <a href="https://github.com/choojs/choo">Choo</a>.</div>
 
 ## Usage
 
 - Format a directory of content as described in the [Hypha documentation](https://github.com/jondashkyle/hypha).
-- A choo app renders your `/content`, as defined by source in `/site`
+- A [Choo](http://github.com/choojs/choo) app renders your `/content`, as defined by source in `/site`
 
 ## Installation
 
@@ -67,5 +69,6 @@ For a more comprehensive unpacking of how this works, take a look at the [inform
 
 ## Todo
 
-- [ ] Cleanup site source
+- [ ] Add a better non-p2p page
+- [ ] Typography credit (info page?)
 - [ ] Use the Enoki Panel in /panel
