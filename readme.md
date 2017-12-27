@@ -1,10 +1,11 @@
 <h1 align="center">Hypha/Beaker Browser Example</h1>
 
-![](assets/example.jpg)
+<div align="center"><a href="https://beaker-hypha-jkm.hashbase.io/">https://beaker-hypha-jkm.hashbase.io/</a></div>
+
+[![](assets/example.jpg)](https://beaker-hypha-jkm.hashbase.io/)
 
 <div align="center">An experimental single-page-app style site generator for <a href="http://beakerbrowser.com">Beaker Browser</a> using <a href="https://github.com/jondashkyle/hypha">Hypha</a> and <a href="https://github.com/choojs/choo">Choo</a>.</div>
 
-<div align="center"><a href="https://beaker-hypha-jkm.hashbase.io/">https://beaker-hypha-jkm.hashbase.io/</a></div>
 
 ## Usage
 
