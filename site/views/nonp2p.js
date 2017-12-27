@@ -17,16 +17,16 @@ function view (state, emit) {
           <img src="/assets/example.jpg" class="w100">
         </a>
       </div>
-      <div class="x fs2 tac p0-5 psr z2 ttu">
-        <div class="c2 p0-5">
+      <div class="x xw fs2 p0-5 psr z2 ttu">
+        <div class="c1 p0-5">
           1
         </div>
-        <div class="c10 p0-5">
+        <div class="c11 p0-5">
           Download <a href="https://beakerbrowser.com">Beaker Browser</a>        </div>
-        <div class="c2 p0-5">
+        <div class="c1 p0-5">
           2
         </div>
-        <div class="p0-5 c10">
+        <div class="p0-5 c11">
           <a href="dat://beaker-hypha-jkm.hashbase.io/">dat://beaker-hypha-jkm.hashbase.io/</a>
         </div>
       </div>
