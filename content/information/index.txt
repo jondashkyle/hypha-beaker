@@ -2,7 +2,11 @@ title: Information
 ----
 view: info
 ----
-text: This is a speculative example of generating a full site using [Hypha](https://github.com/jondashkyle/hypha) with [Choo](https://github.com/jondashkyle/hypha) in Beaker Browser. Although the codebase is quite readable, below is a comprehensive unpacking of what’s going on.
+text: 
+
+I want my sites to be simple. Just a bunch of plain text files. I want to turn those files into a site without having to deal with a server, or apis, or build processes. I want it to be a calm thing. I want to share my site peer-to-peer and not depend on a centralized hosting platform. This is a stab at that.
+
+This is a speculative example of generating a full site using [Hypha](https://github.com/jondashkyle/hypha) with [Choo](https://github.com/jondashkyle/hypha) in Beaker Browser. Although the codebase is quite readable, below is a comprehensive unpacking of what’s going on.
 
 To create our site we read the content inside the `content` directory, making use of the `hypha` module and a simple browserify setup. You can follow along and make changes by opening the `site` directory in your terminal, running `npm install`, then `npm start`.
 
