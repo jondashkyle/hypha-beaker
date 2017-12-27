@@ -13,23 +13,15 @@ async function store (state, emitter, app) {
   state.content = { }
   state.loaded = false
 
-  loadContent(contentDir)
-    .then(handleLoad)
-    .catch(handleError)
-
-  function handleLoad (data) {
-    state.content = data
-    state.loaded = true
+  try {
+    state.content = await loadContent(contentDir)
     state.p2p = true
-    emitter.emit(state.events.RENDER)
+  } catch (err) {
+    state.p2p = false
   }
 
-  function handleError (err) {
-    console.warn(err)
-    state.loaded = true
-    state.p2p = false
-    emitter.emit(state.events.RENDER)
-  }
+  state.loaded = true
+  emitter.emit(state.events.RENDER)
 }
 
 async function loadContent (contentDir) {
@@ -37,5 +29,5 @@ async function loadContent (contentDir) {
   var options = { fs: archive, parent: contentDir }
   var files = await archive.readdir(contentDir, { recursive: true })
   var glob = files.map(function (file) { return path.join(contentDir, file) }) // funny hack
-  return await hypha.readFiles(glob, contentDir, options)
+  return hypha.readFiles(glob, contentDir, options)
 }
