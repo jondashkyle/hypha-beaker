@@ -3,8 +3,6 @@ var raw = require('choo/html/raw')
 var markdown = require('marked')
 var html = require('choo/html')
 
-var utilsContent = require('../utils/content')
-
 module.exports = view
 
 function view (state, emit) {

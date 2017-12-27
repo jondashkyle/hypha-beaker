@@ -17,15 +17,16 @@ function wrapper (state, emit) {
 
   function getView () {
     if (isNotFound()) return notfound
-    else if (!state.p2p) return nonp2p
+    else if (!state.p2p) return views.nonp2p
     else if (isLoading()) return loading
     else return views[page.view] || views.default
   }
 
   function isNotFound () {
-    return !page ||
-    typeof state.content === 'undefined' ||
-    state.loaded && typeof page === 'undefined'
+    if (!page) return true
+    else if (typeof state.content === 'undefined') return true
+    else if (state.loaded && typeof page === 'undefined') return true
+    else return false
   }
 
   function isLoading () {
@@ -35,20 +36,16 @@ function wrapper (state, emit) {
 
 function loading () {
   return html`
-    <div class="x xjc xac psf t0 l0 r0 b0">
+    <div class="x xjc xac psf t0 l0 r0 b0 ttu">
       loading
     </div>
   `
 }
 
 function notfound () {
-  return 'not found'
-}
-
-function nonp2p () {
   return html`
-    <div class="x xjc xac psf t0 l0 r0 b0">
-      this is a p2p site, sorry
+    <div class="x xjc xac psf t0 l0 r0 b0 ttu">
+      not found
     </div>
   `
 }

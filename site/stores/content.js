@@ -9,13 +9,11 @@ var view = require('../views/main')
 module.exports = store
 
 async function store (state, emitter, app) {
-  var archive = new DatArchive(window.location.toString())
   var contentDir = '/content'
-
   state.content = { }
   state.loaded = false
 
-  loadContent(archive, contentDir)
+  loadContent(contentDir)
     .then(handleLoad)
     .catch(handleError)
 
@@ -32,8 +30,9 @@ async function store (state, emitter, app) {
   }
 }
 
-async function loadContent (archive, contentDir) {
+async function loadContent (contentDir) {
   try {
+    var archive = new DatArchive(window.location.toString())
     var options = { fs: archive, parent: contentDir }
     var files = await archive.readdir(contentDir, { recursive: true })
     var glob = files.map(function (file) { return path.join(contentDir, file) }) // funny hack
