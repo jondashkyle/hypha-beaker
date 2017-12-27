@@ -11,3 +11,7 @@ heading: Several interviews and performances I find enjoyable and hope you do to
 text: what up what up
 ----
 offline: This demo uses Youtube to stream large video files, which is not accessible offline
+----
+footer:
+  - Design and development by [Jon-Kyle](https://jon-kyle.com)
+  - Set in Authentic Sans by [Authentic](http://authentic.website/)
