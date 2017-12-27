@@ -46,14 +46,6 @@ function view (state, emit) {
           images: images
         })}
       </div>
-      <ol class="p1">
-        ${images.map(function (file, i) {
-          return html`<li class="x">  
-            <div class="c2">${('0'+(i+1)).slice(-2)}</div>
-            <div class="c10">${file.filename}</div>
-          </li>`
-        })}
-      </ol>
     </div>
   `
 
