@@ -19,5 +19,3 @@ setlist:
   - Greenways Trajectory
   - My Fucking Sound
   - Anstromm-Feck 4 
-----
-text: hi

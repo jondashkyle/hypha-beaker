@@ -1,6 +1,8 @@
 <h1 align="center">Hypha Beaker Example</h1>
 
-A little single-page-app style site generator for Beaker using [Hypha](https://github.com/jondashkyle/hypha).
+![](assets/example.jpg)
+
+<div align="center">A little single-page-app style site generator for Beaker using <a href="https://github.com/jondashkyle/hypha">Hypha</a>.</div>
 
 ## Usage
 
@@ -26,7 +28,7 @@ Of course, you can also just go ahead and clone the Dat archive to get all the b
 
 Creating a view involves placing a js file in the `site/views` directory. This requires some manual configuration. An example of a minimal view:
 
-```
+```js
 var html = require('choo/html')
 
 module.exports = function example (state, emit) {
@@ -40,7 +42,7 @@ module.exports = function example (state, emit) {
 
 We’ll save this as `example.js`. Next, add the view to `site/views/index.js`:
 
-```
+```js
 module.exports = {
   default: require('./default'),
   example: require('./example')
