@@ -1,4 +1,6 @@
 var objectValues = require('object-values')
+var raw = require('choo/html/raw')
+var markdown = require('marked')
 var html = require('choo/html')
 
 var utilsContent = require('../utils/content')
@@ -23,16 +25,7 @@ function view (state, emit) {
     <div class="usn ttu">
       <div class="psr">
         <div class="x xw p0-5">
-          ${utilsContent.shuffle(renderPageImages(interviews))
-              .splice(0, 12)
-              .map(function (image) {
-                return html`
-                  <div class="c4 p0-5">
-                    ${image}
-                  </div>
-                `
-              })
-          }
+          ${createImages()}
         </div>
         <div class="x xjc xac psa t0 l0 r0 b0 pen">
           <div class="p2 psa t0 l0 fs0-5">
@@ -42,37 +35,71 @@ function view (state, emit) {
             <a href="/information" class="pea fc-white tdn">${info.title}</a>
           </div>
           <div class="p2 fs4 ha psr z2 tac">
-            ${utilsContent.shuffle(interviews).map(function (page, i) {
-              return [
-                i === 0 ? html`<span class="curd">${state.page.heading}</span>` : '',
-                html`<div class="circle"></div>`,
-                createLink(page)
-              ]
-            })}
+            ${createInterviews()}
           </div>
         </div>
       </div>
-      <div>
-        ${utilsContent.shuffle(performances).map(function (page, i) {
-          var images = objectValues(page.files).filter(file => file.type === 'image')
-          var image = images[Math.floor(Math.random() * images.length)] 
-          if (!image) return
+      ${createPerformances()}
+      ${createFooter()}
+    </div>
+  `
+
+  function createImages () {
+    return utilsContent.shuffle(renderPageImages(interviews))
+      .splice(0, 12)
+      .map(function (image) {
+        return html`
+          <div class="c4 p0-5">
+            ${image}
+          </div>
+        `
+      })
+  
+  }
+
+  function createInterviews () {
+    return utilsContent.shuffle(interviews).map(function (page, i) {
+      return [
+        i === 0 ? html`<span class="curd">${state.page.heading}</span>` : '',
+        html`<div class="circle"></div>`,
+        createLink(page)
+      ]
+    })
+  }
+
+  function createPerformances () {
+    return utilsContent.shuffle(performances).map(function (page, i) {
+      var images = objectValues(page.files).filter(file => file.type === 'image')
+      var image = images[Math.floor(Math.random() * images.length)] 
+      if (!image) return
+      return html`
+        <a
+          href="${page.url}"
+          class="db psr curp fc-white tdn bgsc bgrn bgpc fs4"
+          style="background-image: url(${image.path})"
+        >
+          <div class="psa t0 l0 r0 b0 x xjc xac tac">
+            ${page.title} / ${page.venue}
+          </div>
+          <div style="padding-bottom: 56.25%"></div>
+        </a>
+      `
+    })
+  }
+
+  function createFooter () {
+    return html`
+      <div class="x p0-5">
+        ${page.footer.map(function (note) {
           return html`
-            <a
-              href="${page.url}"
-              class="db psr curp fc-white tdn bgsc bgrn bgpc fs4"
-              style="background-image: url(${image.path})"
-            >
-              <div class="psa t0 l0 r0 b0 x xjc xac tac">
-                ${page.title} @ ${page.venue}
-              </div>
-              <div style="padding-bottom: 56.25%"></div>
-            </a>
+            <div class="c6 p0-5">
+              ${raw(markdown(note))}
+            </div>
           `
         })}
       </div>
-    </div>
-  `
+    `
+  }
 
   function createLink (props) {
     var visited = state.visited[props.url]
