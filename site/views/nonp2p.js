@@ -14,7 +14,7 @@ function view (state, emit) {
           
         </div>
         <div class="c7 p0-5">
-          ${raw(markdown('This is a speculative example of generating a full site using [Hypha](https://github.com/jondashkyle/hypha) with [Choo](https://github.com/jondashkyle/hypha) in Beaker Browser. Although the codebase is quite readable, below is a comprehensive unpacking of what’s going on.'))}
+          ${raw(markdown('This is a speculative example of generating a full site using [Hypha](https://github.com/jondashkyle/hypha) with [Choo](https://github.com/jondashkyle/hypha) in Beaker Browser. Although the codebase is quite readable, a comprehensive unpacking of what’s going on is included in the information page.'))}
         </div>
       </div>
       <div class="x xw lh1-5 p0-5 psr z2">
@@ -28,6 +28,12 @@ function view (state, emit) {
         </div>
         <div class="px0-5 c11">
           Navigate to <a href="dat://beaker-hypha-jkm.hashbase.io/">dat://beaker-hypha-jkm.hashbase.io/</a>
+        </div>
+        <div class="c1 px0-5">
+          3
+        </div>
+        <div class="px0-5 c11">
+          Fork the site and make some changes to content!
         </div>
       </div>
       <div class="p1">
