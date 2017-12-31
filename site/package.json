@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "watchify index.js -o bundles/bundle.js -g browserify-nodent -t brfs -t sheetify -p [ css-extract -o bundles/bundle.css ] index.js",
-    "build": "browserify index.js -o bundles/bundle.js -g browserify-nodent -t brfs -t [ sheetify -u sheetify-cssnext ] -p [ css-extract -o bundles/bundle.css ]",
+    "start": "watchify index.js -o bundles/bundle.js -t brfs -t sheetify -p [ css-extract -o bundles/bundle.css ] index.js",
+    "build": "browserify index.js -o bundles/bundle.js -t brfs -t [ sheetify -u sheetify-cssnext ] -p [ css-extract -o bundles/bundle.css ]",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -13,7 +13,8 @@
   "license": "MIT",
   "devDependencies": {
     "brfs": "^1.4.3",
-    "browserify-nodent": "^1.0.22"
+    "browserify": "^14.5.0",
+    "watchify": "^3.9.0"
   },
   "dependencies": {
     "bel": "^5.1.3",
